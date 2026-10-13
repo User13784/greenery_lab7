@@ -1,0 +1,13 @@
+import { useTranslation } from 'react-i18next';
+
+function ProductCard({ product }) {
+  const { t, i18n } = useTranslation();   
+
+  return (
+    <div>
+      <h3>{getTranslatedName()}</h3>
+      <button>{t('addToCart')}</button>       
+      <p>Язык: {i18n.language}</p>            
+    </div>
+  );
+}
