@@ -1,26 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
-
-const getUserId = () => {
-  const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
-  return user?.id || null;
-};
-
-const loadFavoritesFromStorage = () => {
-  const userId = getUserId();
-  if (!userId) return [];
-  const saved = localStorage.getItem(`favorites_${userId}`);
-  return saved ? JSON.parse(saved) : [];
-};
-
-const saveFavoritesToStorage = (items) => {
-  const userId = getUserId();
-  if (userId) {
-    localStorage.setItem(`favorites_${userId}`, JSON.stringify(items));
-  }
-};
+import { initialFavorites } from '../../data/initialData';
 
 const initialState = {
-  items: loadFavoritesFromStorage(),
+  items: initialFavorites,
   loading: false,
   error: null
 };
@@ -30,17 +12,12 @@ const favoritesSlice = createSlice({
   initialState,
   reducers: {
     addFavorite(state, action) {
-      const userId = getUserId();
-      if (!userId) return;
-
       const exists = state.items.find(i => i.productId === action.payload.productId);
       if (!exists) {
         state.items.push({
           ...action.payload,
-          id: Date.now().toString(),
-          userId
+          id: Date.now().toString()
         });
-        saveFavoritesToStorage(state.items);
       }
     },
 
@@ -49,27 +26,15 @@ const favoritesSlice = createSlice({
       const index = state.items.findIndex(i => i.id === id);
       if (index !== -1) {
         state.items[index] = { ...state.items[index], ...data };
-        saveFavoritesToStorage(state.items);
       }
     },
 
     removeFavorite(state, action) {
       state.items = state.items.filter(i => i.id !== action.payload);
-      saveFavoritesToStorage(state.items);
     },
 
     clearFavorites(state) {
       state.items = [];
-      saveFavoritesToStorage([]);
-    },
-
-    loadUserFavorites(state) {
-      state.items = loadFavoritesFromStorage();
-    },
-
-    clearFavoritesOnLogout(state) {
-      state.items = [];
-      state.error = null;
     },
 
     setError(state, action) {
@@ -83,8 +48,6 @@ export const {
   updateFavorite,
   removeFavorite,
   clearFavorites,
-  loadUserFavorites,
-  clearFavoritesOnLogout,
   setError
 } = favoritesSlice.actions;
 

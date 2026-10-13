@@ -7,18 +7,12 @@ import {
   loginSuccess,
   selectAllUsers
 } from '../../features/auth/authSlice';
-import {
-  loadUserCart
-} from '../../features/cart/cartSlice';
-import {
-  loadUserFavorites
-} from '../../features/favorites/favoritesSlice';
 
 function RegisterPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const allUsers = useAppSelector(selectAllUsers);   
+  const allUsers = useAppSelector(selectAllUsers);
 
   const [key, setKey] = useState('login');
   const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -50,8 +44,6 @@ function RegisterPage() {
     }
 
     dispatch(loginSuccess(user));
-    dispatch(loadUserCart());        
-    dispatch(loadUserFavorites());    
 
     navigate('/catalog');
     alert(
@@ -83,12 +75,11 @@ function RegisterPage() {
     }
 
     // ⚠️ Регистрация новых пользователей пока не сохраняется
-    // (потому что нет бэкенда). Можно добавить сохранение в localStorage.
+    // (потому что нет бэкенда). Данные хранятся только в Redux.
     const newUser = {
       id: Date.now().toString(),
       ...registerData,
-      role: 'user',
-      createdAt: new Date().toISOString()
+      role: 'user'
     };
 
     dispatch(loginSuccess(newUser));

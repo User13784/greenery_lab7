@@ -9,8 +9,8 @@ import {
   selectUser,
   logout
 } from './features/auth/authSlice';
-import { selectCartCount, clearCartOnLogout } from './features/cart/cartSlice';
-import { clearFavoritesOnLogout } from './features/favorites/favoritesSlice';
+import { selectCartCount, clearCart } from './features/cart/cartSlice';
+import { clearFavorites } from './features/favorites/favoritesSlice';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
@@ -41,8 +41,8 @@ function Header() {
 
   const handleLogout = () => {
     if (window.confirm(t('logoutConfirm'))) {
-      dispatch(clearCartOnLogout());
-      dispatch(clearFavoritesOnLogout());
+      dispatch(clearCart());
+      dispatch(clearFavorites());
       dispatch(logout());
       window.location.href = '/';
     }
