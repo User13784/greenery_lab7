@@ -22,6 +22,7 @@ import FeedbackPage from './components/pages/FeedbackPage';
 import AdminPage from './components/pages/AdminPage';
 import RegisterPage from './components/pages/RegisterPage';
 import NotFoundPage from './components/pages/NotFoundPage';
+import MedicinesPage from './components/pages/MedicinesPage';
 import './App.css';
 
 function Header() {
@@ -88,6 +89,9 @@ function Header() {
           </Nav>
 
           <Nav className="align-items-center">
+            <Nav.Link as={Link} to="/medicines">
+              💊 Лекарства
+            </Nav.Link>
             <Nav.Link as={Link} to="/cart">
               🛒 {t('cart')}
               {cartCount > 0 && (
@@ -124,6 +128,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage title={mainTitle} />} />
               <Route path="/catalog" element={<CatalogPage />} />
+              <Route path="/medicines" element={<MedicinesPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               <Route path="/feedback" element={<FeedbackPage />} />

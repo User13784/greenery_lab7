@@ -1,132 +1,61 @@
-const API_URL = 'http://localhost:3001';
+import axios from 'axios';
 
-export const api = {
-  async getProducts() {
-    const response = await fetch(`${API_URL}/products`);
-    return response.json();
-  },
+const API_URL = 'http://localhost:5000/api';
 
-  async getProduct(id) {
-    const response = await fetch(`${API_URL}/products/${id}`);
-    return response.json();
-  },
+const api = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' }
+});
 
-  async addProduct(data) {
-    const response = await fetch(`${API_URL}/products`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  },
+// ────────────────────────────────────────────────
+// МЕДИЦИНЫ (Лекарства)
+// ────────────────────────────────────────────────
+export const medicinesAPI = {
+  getAll: (params) => api.get('/medicines', { params }).then(r => r.data),
+  getById: (id) => api.get(`/medicines/${id}`).then(r => r.data),
+  create: (data) => api.post('/medicines', data).then(r => r.data),
+  update: (id, data) => api.put(`/medicines/${id}`, data).then(r => r.data),
+  delete: (id) => api.delete(`/medicines/${id}`).then(r => r.data)
+};
 
-  async updateProduct(id, data) {
-    const response = await fetch(`${API_URL}/products/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  },
+// ────────────────────────────────────────────────
+// АПТЕКИ
+// ────────────────────────────────────────────────
+export const pharmaciesAPI = {
+  getAll: (params) => api.get('/pharmacies', { params }).then(r => r.data),
+  getById: (id) => api.get(`/pharmacies/${id}`).then(r => r.data),
+  create: (data) => api.post('/pharmacies', data).then(r => r.data),
+  update: (id, data) => api.put(`/pharmacies/${id}`, data).then(r => r.data),
+  delete: (id) => api.delete(`/pharmacies/${id}`).then(r => r.data)
+};
 
-  async deleteProduct(id) {
-    const response = await fetch(`${API_URL}/products/${id}`, {
-      method: 'DELETE'
-    });
-    return response.ok;
-  },
+// ────────────────────────────────────────────────
+// ЗАЯВКИ
+// ────────────────────────────────────────────────
+export const ordersAPI = {
+  getAll: (params) => api.get('/orders', { params }).then(r => r.data),
+  getById: (id) => api.get(`/orders/${id}`).then(r => r.data),
+  create: (data) => api.post('/orders', data).then(r => r.data),
+  update: (id, data) => api.put(`/orders/${id}`, data).then(r => r.data),
+  delete: (id) => api.delete(`/orders/${id}`).then(r => r.data)
+};
 
-  async getCart() {
-    const response = await fetch(`${API_URL}/cart`);
-    return response.json();
-  },
+// ────────────────────────────────────────────────
+// ЗАКУПКИ
+// ────────────────────────────────────────────────
+export const purchasesAPI = {
+  getAll: (params) => api.get('/purchases', { params }).then(r => r.data),
+  getById: (id) => api.get(`/purchases/${id}`).then(r => r.data),
+  create: (data) => api.post('/purchases', data).then(r => r.data),
+  update: (id, data) => api.put(`/purchases/${id}`, data).then(r => r.data),
+  delete: (id) => api.delete(`/purchases/${id}`).then(r => r.data)
+};
 
-  async addToCart(item) {
-    const response = await fetch(`${API_URL}/cart`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item)
-    });
-    return response.json();
-  },
-
-  async updateCartItem(id, quantity) {
-    const response = await fetch(`${API_URL}/cart/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quantity })
-    });
-    return response.json();
-  },
-
-  async removeFromCart(id) {
-    const response = await fetch(`${API_URL}/cart/${id}`, {
-      method: 'DELETE'
-    });
-    return response.ok;
-  },
-
-  async getFavorites() {
-    const response = await fetch(`${API_URL}/favorites`);
-    return response.json();
-  },
-
-  async addToFavorites(item) {
-    const response = await fetch(`${API_URL}/favorites`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item)
-    });
-    return response.json();
-  },
-
-  async removeFromFavorites(id) {
-    const response = await fetch(`${API_URL}/favorites/${id}`, {
-      method: 'DELETE'
-    });
-    return response.ok;
-  },
-
-  async getUsers() {
-    const response = await fetch(`${API_URL}/users`);
-    return response.json();
-  },
-
-  async registerUser(data) {
-    const response = await fetch(`${API_URL}/users`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  },
-
-  async loginUser(email) {
-    const response = await fetch(`${API_URL}/users?email=${email}`);
-    const users = await response.json();
-    return users[0] || null;
-  },
-
-  async getFeedback() {
-    const response = await fetch(`${API_URL}/feedback`);
-    return response.json();
-  },
-
-  async addFeedback(data) {
-    const response = await fetch(`${API_URL}/feedback`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  },
-
-  async deleteFeedback(id) {
-    const response = await fetch(`${API_URL}/feedback/${id}`, {
-      method: 'DELETE'
-    });
-    return response.ok;
-  }
+// ────────────────────────────────────────────────
+// ОТЧЁТЫ
+// ────────────────────────────────────────────────
+export const reportsAPI = {
+  getOrdersReport: (year) => api.get('/reports/orders', { params: { year } }).then(r => r.data)
 };
 
 export default api;

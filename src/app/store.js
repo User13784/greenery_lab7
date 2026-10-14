@@ -4,6 +4,7 @@ import cartReducer from '../features/cart/cartSlice';
 import favoritesReducer from '../features/favorites/favoritesSlice';
 import authReducer from '../features/auth/authSlice';
 import feedbackReducer from '../features/feedback/feedbackSlice';
+import medicinesReducer from '../features/medicines/medicinesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     cart: cartReducer,
     favorites: favoritesReducer,
     auth: authReducer,
-    feedback: feedbackReducer
+    feedback: feedbackReducer,
+    medicines: medicinesReducer
   },
   devTools: process.env.NODE_ENV !== 'production'
 });
