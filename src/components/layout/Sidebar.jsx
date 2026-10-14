@@ -10,11 +10,19 @@ function Sidebar({ companyName = "Greenery" }) {
   const isAdmin = useAppSelector(selectIsAdmin);
 
   const menuItems = [
+    // Магазин мебели
     { path: '/', icon: 'home', label: t('home') },
     { path: '/catalog', icon: 'shop', label: t('shop') },
     { path: '/favorites', icon: 'heart', label: t('favorites') },
     { path: '/feedback', icon: 'blog', label: t('reviews') },
-    { path: '/cart', icon: 'cart', label: t('cart') }
+    { path: '/cart', icon: 'cart', label: t('cart') },
+
+    // Аптечный склад (Лабораторная 7)
+    { path: '/medicines', emoji: '💊', label: 'Лекарства' },
+    { path: '/pharmacies', emoji: '🏥', label: 'Аптеки' },
+    { path: '/orders', emoji: '📋', label: 'Заявки' },
+    { path: '/purchases', emoji: '📦', label: 'Закупки' },
+    { path: '/reports', emoji: '📊', label: 'Отчёты' }
   ];
 
   return (
@@ -42,14 +50,18 @@ function Sidebar({ companyName = "Greenery" }) {
               to={item.path}
               className="d-flex flex-column align-items-center py-3"
             >
-              <img
-                src={`/assets/icons/${item.icon}.png`}
-                alt={item.label}
-                width="28"
-                height="28"
-                className="mb-1"
-                style={{ filter: 'brightness(0) invert(0.85)' }}
-              />
+              {item.emoji ? (
+                <span style={{ fontSize: '24px' }} className="mb-1">{item.emoji}</span>
+              ) : (
+                <img
+                  src={`/assets/icons/${item.icon}.png`}
+                  alt={item.label}
+                  width="28"
+                  height="28"
+                  className="mb-1"
+                  style={{ filter: 'brightness(0) invert(0.85)' }}
+                />
+              )}
               <span style={{ fontSize: '12px' }}>{item.label}</span>
             </Nav.Link>
           ))}

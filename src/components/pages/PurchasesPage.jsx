@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Table, Button, Form, Alert, Pagination, Badge } from 'react-bootstrap';
+import { Container, Table, Button, Form, Alert, Pagination, Badge, Modal } from 'react-bootstrap';
 import {
   fetchPurchases,
   createPurchase,
+  updatePurchase,
   deletePurchase,
   selectPurchases,
   selectPurchasesLoading,
@@ -23,11 +24,15 @@ function PurchasesPage() {
   const { totalPages, currentPage } = useSelector(selectPurchasesPagination);
 
   const [page, setPage] = useState(1);
+
   const [formData, setFormData] = useState({
     orderId: '',
     medicineId: '',
     quantity: ''
   });
+
+  const [editingItem, setEditingItem] = useState(null);
+  const [editForm, setEditForm] = useState({});
 
   useEffect(() => {
     dispatch(fetchPurchases({ page, limit: 10 }));
@@ -39,7 +44,7 @@ function PurchasesPage() {
     }
   }, [dispatch, page]);
 
-  const handleSubmit = (e) => {
+  const handleCreate = (e) => {
     e.preventDefault();
     if (!formData.orderId || !formData.medicineId || !formData.quantity) {
       alert('Заполните все поля');
@@ -55,6 +60,38 @@ function PurchasesPage() {
       quantity: parseInt(formData.quantity)
     })).then(() => {
       setFormData({ orderId: '', medicineId: '', quantity: '' });
+      dispatch(fetchPurchases({ page, limit: 10 }));
+    });
+  };
+
+  const handleOpenEdit = (item) => {
+    setEditingItem(item);
+    setEditForm({
+      orderId: item.orderId || '',
+      medicineId: item.medicineId || '',
+      quantity: item.quantity || ''
+    });
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editForm.orderId || !editForm.medicineId || !editForm.quantity) {
+      alert('Заполните все поля');
+      return;
+    }
+    if (parseInt(editForm.quantity) < 1) {
+      alert('Количество должно быть ≥ 1');
+      return;
+    }
+    dispatch(updatePurchase({
+      id: editingItem.id,
+      data: {
+        orderId: parseInt(editForm.orderId),
+        medicineId: parseInt(editForm.medicineId),
+        quantity: parseInt(editForm.quantity)
+      }
+    })).then(() => {
+      setEditingItem(null);
       dispatch(fetchPurchases({ page, limit: 10 }));
     });
   };
@@ -75,7 +112,7 @@ function PurchasesPage() {
 
       <div className="bg-light p-3 rounded mb-4">
         <h5>➕ Добавить закупку</h5>
-        <Form onSubmit={handleSubmit} className="row g-2">
+        <Form onSubmit={handleCreate} className="row g-2">
           <div className="col-md-4">
             <Form.Select
               value={formData.orderId}
@@ -83,7 +120,9 @@ function PurchasesPage() {
             >
               <option value="">— Выберите заявку —</option>
               {orders.map(o => (
-                <option key={o.id} value={o.id}>Заявка №{o.id} ({o.pharmacy?.name || '?'})</option>
+                <option key={o.id} value={o.id}>
+                  Заявка №{o.id} ({o.pharmacy?.name || '?'})
+                </option>
               ))}
             </Form.Select>
           </div>
@@ -94,7 +133,9 @@ function PurchasesPage() {
             >
               <option value="">— Выберите лекарство —</option>
               {medicines.map(m => (
-                <option key={m.id} value={m.id}>{m.name} ({m.manufacturer})</option>
+                <option key={m.id} value={m.id}>
+                  {m.name} ({m.manufacturer})
+                </option>
               ))}
             </Form.Select>
           </div>
@@ -141,7 +182,19 @@ function PurchasesPage() {
                   <td>{p.medicine?.manufacturer || '—'}</td>
                   <td><Badge bg="success">{p.quantity} шт.</Badge></td>
                   <td>
-                    <Button size="sm" variant="danger" onClick={() => handleDelete(p.id)}>
+                    <Button
+                      size="sm"
+                      variant="warning"
+                      className="me-2"
+                      onClick={() => handleOpenEdit(p)}
+                    >
+                      ✏️
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleDelete(p.id)}
+                    >
                       🗑️
                     </Button>
                   </td>
@@ -165,6 +218,60 @@ function PurchasesPage() {
           )}
         </>
       )}
+
+      <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>✏️ Редактировать закупку №{editingItem?.id}</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleSaveEdit}>
+          <Modal.Body>
+            <Form.Group className="mb-3">
+              <Form.Label>Заявка</Form.Label>
+              <Form.Select
+                value={editForm.orderId || ''}
+                onChange={(e) => setEditForm({ ...editForm, orderId: e.target.value })}
+                required
+              >
+                <option value="">— Выберите заявку —</option>
+                {orders.map(o => (
+                  <option key={o.id} value={o.id}>
+                    Заявка №{o.id} ({o.pharmacy?.name || '?'})
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Лекарство</Form.Label>
+              <Form.Select
+                value={editForm.medicineId || ''}
+                onChange={(e) => setEditForm({ ...editForm, medicineId: e.target.value })}
+                required
+              >
+                <option value="">— Выберите лекарство —</option>
+                {medicines.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} ({m.manufacturer})
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Количество (шт.)</Form.Label>
+              <Form.Control
+                type="number"
+                min="1"
+                value={editForm.quantity || ''}
+                onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
+                required
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
+            <Button variant="primary" type="submit">💾 Сохранить</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </Container>
   );
 }

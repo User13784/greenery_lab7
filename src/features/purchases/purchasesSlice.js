@@ -23,6 +23,17 @@ export const createPurchase = createAsyncThunk(
   }
 );
 
+export const updatePurchase = createAsyncThunk(
+  'purchases/updatePurchase',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      return await purchasesAPI.update(id, data);
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || err.message);
+    }
+  }
+);
+
 export const deletePurchase = createAsyncThunk(
   'purchases/deletePurchase',
   async (id, { rejectWithValue }) => {
@@ -64,6 +75,10 @@ const purchasesSlice = createSlice({
       })
       .addCase(createPurchase.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
+      })
+      .addCase(updatePurchase.fulfilled, (state, action) => {
+        const idx = state.items.findIndex(p => p.id === action.payload.id);
+        if (idx !== -1) state.items[idx] = { ...state.items[idx], ...action.payload };
       })
       .addCase(deletePurchase.fulfilled, (state, action) => {
         state.items = state.items.filter(p => p.id !== action.payload);

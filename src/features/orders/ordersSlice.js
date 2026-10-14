@@ -23,6 +23,17 @@ export const createOrder = createAsyncThunk(
   }
 );
 
+export const updateOrder = createAsyncThunk(
+  'orders/updateOrder',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      return await ordersAPI.update(id, data);
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || err.message);
+    }
+  }
+);
+
 export const deleteOrder = createAsyncThunk(
   'orders/deleteOrder',
   async (id, { rejectWithValue }) => {
@@ -64,6 +75,10 @@ const ordersSlice = createSlice({
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
+      })
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        const idx = state.items.findIndex(o => o.id === action.payload.id);
+        if (idx !== -1) state.items[idx] = { ...state.items[idx], ...action.payload };
       })
       .addCase(deleteOrder.fulfilled, (state, action) => {
         state.items = state.items.filter(o => o.id !== action.payload);

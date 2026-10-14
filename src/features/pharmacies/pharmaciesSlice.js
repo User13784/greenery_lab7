@@ -23,6 +23,17 @@ export const createPharmacy = createAsyncThunk(
   }
 );
 
+export const updatePharmacy = createAsyncThunk(
+  'pharmacies/updatePharmacy',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      return await pharmaciesAPI.update(id, data);
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || err.message);
+    }
+  }
+);
+
 export const deletePharmacy = createAsyncThunk(
   'pharmacies/deletePharmacy',
   async (id, { rejectWithValue }) => {
@@ -64,6 +75,10 @@ const pharmaciesSlice = createSlice({
       })
       .addCase(createPharmacy.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
+      })
+      .addCase(updatePharmacy.fulfilled, (state, action) => {
+        const idx = state.items.findIndex(p => p.id === action.payload.id);
+        if (idx !== -1) state.items[idx] = action.payload;
       })
       .addCase(deletePharmacy.fulfilled, (state, action) => {
         state.items = state.items.filter(p => p.id !== action.payload);

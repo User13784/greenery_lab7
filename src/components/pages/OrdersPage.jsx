@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Table, Button, Form, Alert, Pagination, Badge } from 'react-bootstrap';
+import { Container, Table, Button, Form, Alert, Pagination, Badge, Modal } from 'react-bootstrap';
 import {
   fetchOrders,
   createOrder,
+  updateOrder,
   deleteOrder,
   selectOrders,
   selectOrdersLoading,
@@ -21,21 +22,26 @@ function OrdersPage() {
   const { totalPages, currentPage } = useSelector(selectOrdersPagination);
 
   const [page, setPage] = useState(1);
+
+  const today = new Date().toISOString().slice(0, 10);
+
   const [formData, setFormData] = useState({
     pharmacyId: '',
-    createdDate: new Date().toISOString().slice(0, 10),
+    createdDate: today,
     dueDate: ''
   });
 
+  const [editingItem, setEditingItem] = useState(null);
+  const [editForm, setEditForm] = useState({});
+
   useEffect(() => {
     dispatch(fetchOrders({ page, limit: 10 }));
-    // Загружаем список аптек для выпадающего списка (только если пусто)
     if (pharmacies.length === 0) {
       dispatch(fetchPharmacies({ limit: 100 }));
     }
   }, [dispatch, page]);
 
-  const handleSubmit = (e) => {
+  const handleCreate = (e) => {
     e.preventDefault();
     if (!formData.pharmacyId || !formData.createdDate || !formData.dueDate) {
       alert('Заполните все поля');
@@ -46,11 +52,35 @@ function OrdersPage() {
       createdDate: formData.createdDate,
       dueDate: formData.dueDate
     })).then(() => {
-      setFormData({
-        pharmacyId: '',
-        createdDate: new Date().toISOString().slice(0, 10),
-        dueDate: ''
-      });
+      setFormData({ pharmacyId: '', createdDate: today, dueDate: '' });
+      dispatch(fetchOrders({ page, limit: 10 }));
+    });
+  };
+
+  const handleOpenEdit = (item) => {
+    setEditingItem(item);
+    setEditForm({
+      pharmacyId: item.pharmacyId || '',
+      createdDate: item.createdDate ? item.createdDate.slice(0, 10) : '',
+      dueDate: item.dueDate ? item.dueDate.slice(0, 10) : ''
+    });
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editForm.pharmacyId || !editForm.createdDate || !editForm.dueDate) {
+      alert('Заполните все поля');
+      return;
+    }
+    dispatch(updateOrder({
+      id: editingItem.id,
+      data: {
+        pharmacyId: parseInt(editForm.pharmacyId),
+        createdDate: editForm.createdDate,
+        dueDate: editForm.dueDate
+      }
+    })).then(() => {
+      setEditingItem(null);
       dispatch(fetchOrders({ page, limit: 10 }));
     });
   };
@@ -71,7 +101,7 @@ function OrdersPage() {
 
       <div className="bg-light p-3 rounded mb-4">
         <h5>➕ Добавить заявку</h5>
-        <Form onSubmit={handleSubmit} className="row g-2">
+        <Form onSubmit={handleCreate} className="row g-2">
           <div className="col-md-4">
             <Form.Select
               value={formData.pharmacyId}
@@ -133,7 +163,19 @@ function OrdersPage() {
                     <Badge bg="info">{o.purchases?.length || 0}</Badge>
                   </td>
                   <td>
-                    <Button size="sm" variant="danger" onClick={() => handleDelete(o.id)}>
+                    <Button
+                      size="sm"
+                      variant="warning"
+                      className="me-2"
+                      onClick={() => handleOpenEdit(o)}
+                    >
+                      ✏️
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleDelete(o.id)}
+                    >
                       🗑️
                     </Button>
                   </td>
@@ -157,6 +199,51 @@ function OrdersPage() {
           )}
         </>
       )}
+
+      <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>✏️ Редактировать заявку №{editingItem?.id}</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleSaveEdit}>
+          <Modal.Body>
+            <Form.Group className="mb-3">
+              <Form.Label>Аптека</Form.Label>
+              <Form.Select
+                value={editForm.pharmacyId || ''}
+                onChange={(e) => setEditForm({ ...editForm, pharmacyId: e.target.value })}
+                required
+              >
+                <option value="">— Выберите аптеку —</option>
+                {pharmacies.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Дата составления</Form.Label>
+              <Form.Control
+                type="date"
+                value={editForm.createdDate || ''}
+                onChange={(e) => setEditForm({ ...editForm, createdDate: e.target.value })}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Дата выполнения</Form.Label>
+              <Form.Control
+                type="date"
+                value={editForm.dueDate || ''}
+                onChange={(e) => setEditForm({ ...editForm, dueDate: e.target.value })}
+                required
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
+            <Button variant="primary" type="submit">💾 Сохранить</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </Container>
   );
 }

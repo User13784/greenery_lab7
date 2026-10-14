@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Table, Button, Form, Alert, Pagination } from 'react-bootstrap';
+import { Container, Table, Button, Form, Alert, Pagination, Modal } from 'react-bootstrap';
 import {
   fetchPharmacies,
   createPharmacy,
+  updatePharmacy,
   deletePharmacy,
   selectPharmacies,
   selectPharmaciesLoading,
@@ -20,6 +21,7 @@ function PharmaciesPage() {
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -27,11 +29,14 @@ function PharmaciesPage() {
     photoUrl: 'https://picsum.photos/seed/newpharm/200/200'
   });
 
+  const [editingItem, setEditingItem] = useState(null);
+  const [editForm, setEditForm] = useState({});
+
   useEffect(() => {
     dispatch(fetchPharmacies({ page, limit: 10, search }));
   }, [dispatch, page, search]);
 
-  const handleSubmit = (e) => {
+  const handleCreate = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.address || !formData.phone) {
       alert('Заполните обязательные поля');
@@ -42,6 +47,28 @@ function PharmaciesPage() {
         name: '', address: '', phone: '',
         photoUrl: 'https://picsum.photos/seed/newpharm/200/200'
       });
+      dispatch(fetchPharmacies({ page, limit: 10, search }));
+    });
+  };
+
+  const handleOpenEdit = (item) => {
+    setEditingItem(item);
+    setEditForm({
+      name: item.name,
+      address: item.address,
+      phone: item.phone,
+      photoUrl: item.photoUrl || ''
+    });
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editForm.name || !editForm.address || !editForm.phone) {
+      alert('Заполните обязательные поля');
+      return;
+    }
+    dispatch(updatePharmacy({ id: editingItem.id, data: editForm })).then(() => {
+      setEditingItem(null);
       dispatch(fetchPharmacies({ page, limit: 10, search }));
     });
   };
@@ -70,7 +97,7 @@ function PharmaciesPage() {
 
       <div className="bg-light p-3 rounded mb-4">
         <h5>➕ Добавить аптеку</h5>
-        <Form onSubmit={handleSubmit} className="row g-2">
+        <Form onSubmit={handleCreate} className="row g-2">
           <div className="col-md-3">
             <Form.Control
               placeholder="Название"
@@ -139,7 +166,21 @@ function PharmaciesPage() {
                   <td>{p.address}</td>
                   <td>{p.phone}</td>
                   <td>
-                    <Button size="sm" variant="danger" onClick={() => handleDelete(p.id, p.name)}>
+                    <Button
+                      size="sm"
+                      variant="warning"
+                      className="me-2"
+                      onClick={() => handleOpenEdit(p)}
+                      title="Редактировать"
+                    >
+                      ✏️
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleDelete(p.id, p.name)}
+                      title="Удалить"
+                    >
                       🗑️
                     </Button>
                   </td>
@@ -163,6 +204,61 @@ function PharmaciesPage() {
           )}
         </>
       )}
+
+      <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>✏️ Редактировать: {editingItem?.name}</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleSaveEdit}>
+          <Modal.Body>
+            <Form.Group className="mb-3">
+              <Form.Label>Название</Form.Label>
+              <Form.Control
+                value={editForm.name || ''}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Адрес</Form.Label>
+              <Form.Control
+                value={editForm.address || ''}
+                onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Телефон</Form.Label>
+              <Form.Control
+                value={editForm.phone || ''}
+                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>URL фото</Form.Label>
+              <Form.Control
+                value={editForm.photoUrl || ''}
+                onChange={(e) => setEditForm({ ...editForm, photoUrl: e.target.value })}
+              />
+            </Form.Group>
+            {editForm.photoUrl && (
+              <div className="text-center">
+                <img
+                  src={editForm.photoUrl}
+                  alt="Preview"
+                  style={{ maxHeight: 120, objectFit: 'cover', borderRadius: 8 }}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
+            <Button variant="primary" type="submit">💾 Сохранить</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </Container>
   );
 }
