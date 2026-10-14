@@ -23,6 +23,10 @@ import AdminPage from './components/pages/AdminPage';
 import RegisterPage from './components/pages/RegisterPage';
 import NotFoundPage from './components/pages/NotFoundPage';
 import MedicinesPage from './components/pages/MedicinesPage';
+import PharmaciesPage from './components/pages/PharmaciesPage';
+import OrdersPage from './components/pages/OrdersPage';
+import PurchasesPage from './components/pages/PurchasesPage';
+import ReportsPage from './components/pages/ReportsPage';
 import './App.css';
 
 function Header() {
@@ -92,6 +96,18 @@ function Header() {
             <Nav.Link as={Link} to="/medicines">
               💊 Лекарства
             </Nav.Link>
+            <Nav.Link as={Link} to="/pharmacies">
+              🏥 Аптеки
+            </Nav.Link>
+            <Nav.Link as={Link} to="/orders">
+              📋 Заявки
+            </Nav.Link>
+            <Nav.Link as={Link} to="/purchases">
+              📦 Закупки
+            </Nav.Link>
+            <Nav.Link as={Link} to="/reports">
+              📊 Отчёты
+            </Nav.Link>
             <Nav.Link as={Link} to="/cart">
               🛒 {t('cart')}
               {cartCount > 0 && (
@@ -126,14 +142,23 @@ function App() {
           <main className="main-content flex-grow-1 p-3">
             <Header />
             <Routes>
+              {/* Магазин мебели */}
               <Route path="/" element={<HomePage title={mainTitle} />} />
               <Route path="/catalog" element={<CatalogPage />} />
-              <Route path="/medicines" element={<MedicinesPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               <Route path="/feedback" element={<FeedbackPage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/register" element={<RegisterPage />} />
+
+              {/* Аптечный склад (лабораторная 7) */}
+              <Route path="/medicines" element={<MedicinesPage />} />
+              <Route path="/pharmacies" element={<PharmaciesPage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/purchases" element={<PurchasesPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+
+              {/* 404 */}
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
             <Footer />

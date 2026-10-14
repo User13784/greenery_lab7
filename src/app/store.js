@@ -5,6 +5,10 @@ import favoritesReducer from '../features/favorites/favoritesSlice';
 import authReducer from '../features/auth/authSlice';
 import feedbackReducer from '../features/feedback/feedbackSlice';
 import medicinesReducer from '../features/medicines/medicinesSlice';
+import pharmaciesReducer from '../features/pharmacies/pharmaciesSlice';
+import ordersReducer from '../features/orders/ordersSlice';
+import purchasesReducer from '../features/purchases/purchasesSlice';
+import reportsReducer from '../features/reports/reportsSlice';   // ← ДОБАВИТЬ
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +17,11 @@ export const store = configureStore({
     favorites: favoritesReducer,
     auth: authReducer,
     feedback: feedbackReducer,
-    medicines: medicinesReducer
+    medicines: medicinesReducer,
+    pharmacies: pharmaciesReducer,
+    orders: ordersReducer,
+    purchases: purchasesReducer,
+    reports: reportsReducer                                     // ← ДОБАВИТЬ
   },
   devTools: process.env.NODE_ENV !== 'production'
 });
