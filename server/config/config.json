@@ -1,15 +1,32 @@
 {
   "development": {
-    "dialect": "sqlite",
-    "storage": "./database.sqlite",
+    "username": "postgres",
+    "password": "mainpasswordpostgre",
+    "database": "pharmacy_db",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres",
     "logging": false
   },
   "test": {
-    "dialect": "sqlite",
-    "storage": "./database.test.sqlite",
+    "username": "postgres",
+    "password": "mainpasswordpostgre",
+    "database": "pharmacy_db_test",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres",
     "logging": false
   },
   "production": {
+    "username": "postgres",
+    "password": "mainpasswordpostgre",
+    "database": "pharmacy_db",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false
+  },
+  "sqlite-fallback": {
     "dialect": "sqlite",
     "storage": "./database.sqlite",
     "logging": false
