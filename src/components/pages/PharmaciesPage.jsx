@@ -11,6 +11,7 @@ import {
   selectPharmaciesError,
   selectPharmaciesPagination
 } from '../../features/pharmacies/pharmaciesSlice';
+import { selectIsAdmin, selectIsAuthenticated } from '../../features/auth/authSlice';
 
 function PharmaciesPage() {
   const dispatch = useDispatch();
@@ -18,15 +19,14 @@ function PharmaciesPage() {
   const loading = useSelector(selectPharmaciesLoading);
   const error = useSelector(selectPharmaciesError);
   const { totalPages, currentPage } = useSelector(selectPharmaciesPagination);
+  const isAdmin = useSelector(selectIsAdmin);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
   const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    photoUrl: 'https://picsum.photos/seed/newpharm/200/200'
+    name: '', address: '', phone: '', photoUrl: '/photos/pharmacy1.jpg'
   });
 
   const [editingItem, setEditingItem] = useState(null);
@@ -43,10 +43,7 @@ function PharmaciesPage() {
       return;
     }
     dispatch(createPharmacy(formData)).then(() => {
-      setFormData({
-        name: '', address: '', phone: '',
-        photoUrl: 'https://picsum.photos/seed/newpharm/200/200'
-      });
+      setFormData({ name: '', address: '', phone: '', photoUrl: '/photos/pharmacy1.jpg' });
       dispatch(fetchPharmacies({ page, limit: 10, search }));
     });
   };
@@ -54,19 +51,13 @@ function PharmaciesPage() {
   const handleOpenEdit = (item) => {
     setEditingItem(item);
     setEditForm({
-      name: item.name,
-      address: item.address,
-      phone: item.phone,
-      photoUrl: item.photoUrl || ''
+      name: item.name, address: item.address, phone: item.phone,
+      photoUrl: item.photoUrl || '/photos/pharmacy1.jpg'
     });
   };
 
   const handleSaveEdit = (e) => {
     e.preventDefault();
-    if (!editForm.name || !editForm.address || !editForm.phone) {
-      alert('Заполните обязательные поля');
-      return;
-    }
     dispatch(updatePharmacy({ id: editingItem.id, data: editForm })).then(() => {
       setEditingItem(null);
       dispatch(fetchPharmacies({ page, limit: 10, search }));
@@ -85,6 +76,13 @@ function PharmaciesPage() {
     <Container className="py-4">
       <h1 className="mb-4">🏥 Аптеки</h1>
 
+      {!isAdmin && (
+        <Alert variant="info">
+          ℹ️ Режим <strong>«Только чтение»</strong>.
+          {!isAuthenticated && ' Войдите как администратор, чтобы управлять данными.'}
+        </Alert>
+      )}
+
       {error && <Alert variant="danger">Ошибка: {error}</Alert>}
 
       <Form.Control
@@ -95,42 +93,44 @@ function PharmaciesPage() {
         className="mb-3"
       />
 
-      <div className="bg-light p-3 rounded mb-4">
-        <h5>➕ Добавить аптеку</h5>
-        <Form onSubmit={handleCreate} className="row g-2">
-          <div className="col-md-3">
-            <Form.Control
-              placeholder="Название"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-          <div className="col-md-3">
-            <Form.Control
-              placeholder="Адрес"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-          </div>
-          <div className="col-md-2">
-            <Form.Control
-              placeholder="Телефон"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-          </div>
-          <div className="col-md-2">
-            <Form.Control
-              placeholder="URL фото"
-              value={formData.photoUrl}
-              onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
-            />
-          </div>
-          <div className="col-md-2">
-            <Button type="submit" variant="primary" className="w-100">Добавить</Button>
-          </div>
-        </Form>
-      </div>
+      {isAdmin && (
+        <div className="bg-light p-3 rounded mb-4">
+          <h5>➕ Добавить аптеку</h5>
+          <Form onSubmit={handleCreate} className="row g-2">
+            <div className="col-md-3">
+              <Form.Control
+                placeholder="Название"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div className="col-md-3">
+              <Form.Control
+                placeholder="Адрес"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              />
+            </div>
+            <div className="col-md-2">
+              <Form.Control
+                placeholder="Телефон"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              />
+            </div>
+            <div className="col-md-2">
+              <Form.Control
+                placeholder="URL фото"
+                value={formData.photoUrl}
+                onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
+              />
+            </div>
+            <div className="col-md-2">
+              <Button type="submit" variant="primary" className="w-100">Добавить</Button>
+            </div>
+          </Form>
+        </div>
+      )}
 
       {loading && <p>Загрузка...</p>}
 
@@ -148,7 +148,7 @@ function PharmaciesPage() {
                 <th>Название</th>
                 <th>Адрес</th>
                 <th>Телефон</th>
-                <th>Действия</th>
+                {isAdmin && <th>Действия</th>}
               </tr>
             </thead>
             <tbody>
@@ -157,33 +157,25 @@ function PharmaciesPage() {
                   <td>{p.id}</td>
                   <td>
                     <img
-                      src={p.photoUrl || 'https://picsum.photos/seed/pharm/50/50'}
+                      src={p.photoUrl || '/photos/pharmacy1.jpg'}
                       alt={p.name}
                       style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
+                      onError={(e) => { e.target.src = '/photos/pharmacy1.jpg'; }}
                     />
                   </td>
                   <td>{p.name}</td>
                   <td>{p.address}</td>
                   <td>{p.phone}</td>
-                  <td>
-                    <Button
-                      size="sm"
-                      variant="warning"
-                      className="me-2"
-                      onClick={() => handleOpenEdit(p)}
-                      title="Редактировать"
-                    >
-                      ✏️
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onClick={() => handleDelete(p.id, p.name)}
-                      title="Удалить"
-                    >
-                      🗑️
-                    </Button>
-                  </td>
+                  {isAdmin && (
+                    <td>
+                      <Button size="sm" variant="warning" className="me-2" onClick={() => handleOpenEdit(p)}>
+                        ✏️
+                      </Button>
+                      <Button size="sm" variant="danger" onClick={() => handleDelete(p.id, p.name)}>
+                        🗑️
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -205,60 +197,52 @@ function PharmaciesPage() {
         </>
       )}
 
-      <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>✏️ Редактировать: {editingItem?.name}</Modal.Title>
-        </Modal.Header>
-        <Form onSubmit={handleSaveEdit}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label>Название</Form.Label>
-              <Form.Control
-                value={editForm.name || ''}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Адрес</Form.Label>
-              <Form.Control
-                value={editForm.address || ''}
-                onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Телефон</Form.Label>
-              <Form.Control
-                value={editForm.phone || ''}
-                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>URL фото</Form.Label>
-              <Form.Control
-                value={editForm.photoUrl || ''}
-                onChange={(e) => setEditForm({ ...editForm, photoUrl: e.target.value })}
-              />
-            </Form.Group>
-            {editForm.photoUrl && (
-              <div className="text-center">
-                <img
-                  src={editForm.photoUrl}
-                  alt="Preview"
-                  style={{ maxHeight: 120, objectFit: 'cover', borderRadius: 8 }}
-                  onError={(e) => { e.target.style.display = 'none'; }}
+      {isAdmin && (
+        <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>✏️ Редактировать: {editingItem?.name}</Modal.Title>
+          </Modal.Header>
+          <Form onSubmit={handleSaveEdit}>
+            <Modal.Body>
+              <Form.Group className="mb-3">
+                <Form.Label>Название</Form.Label>
+                <Form.Control
+                  value={editForm.name || ''}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  required
                 />
-              </div>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
-            <Button variant="primary" type="submit">💾 Сохранить</Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Адрес</Form.Label>
+                <Form.Control
+                  value={editForm.address || ''}
+                  onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                  required
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Телефон</Form.Label>
+                <Form.Control
+                  value={editForm.phone || ''}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  required
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>URL фото</Form.Label>
+                <Form.Control
+                  value={editForm.photoUrl || '/photos/pharmacy1.jpg'}
+                  onChange={(e) => setEditForm({ ...editForm, photoUrl: e.target.value })}
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
+              <Button variant="primary" type="submit">💾 Сохранить</Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      )}
     </Container>
   );
 }

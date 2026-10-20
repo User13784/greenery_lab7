@@ -15,7 +15,7 @@ module.exports = {
         name: `Аптека №${i}`,
         address: `${streetNames[i % 5]}, д. ${i}`,
         phone: `+375 (29) 111-22-${i.toString().padStart(2, '0')}`,
-        photoUrl: `https://picsum.photos/seed/pharmacy${i}/300/200`,
+photoUrl: '/photos/pharmacy.svg',
         createdAt: now,
         updatedAt: now
       });
@@ -39,7 +39,7 @@ module.exports = {
         name: `${medicineNames[(i - 1) % 10]} ${i}`,
         manufacturer: manufacturers[(i - 1) % 5],
         price: (Math.random() * 20 + 5).toFixed(2),
-        photoUrl: `https://picsum.photos/seed/medicine${i}/300/200`,
+photoUrl: '/photos/medicine.svg',
         createdAt: now,
         updatedAt: now
       });

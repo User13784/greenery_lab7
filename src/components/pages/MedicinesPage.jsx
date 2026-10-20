@@ -11,6 +11,7 @@ import {
   selectMedicinesError,
   selectMedicinesPagination
 } from '../../features/medicines/medicinesSlice';
+import { selectIsAdmin, selectIsAuthenticated } from '../../features/auth/authSlice';
 
 function MedicinesPage() {
   const dispatch = useDispatch();
@@ -18,19 +19,19 @@ function MedicinesPage() {
   const loading = useSelector(selectMedicinesLoading);
   const error = useSelector(selectMedicinesError);
   const { totalPages, currentPage } = useSelector(selectMedicinesPagination);
+  const isAdmin = useSelector(selectIsAdmin);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
-  // Форма создания
   const [formData, setFormData] = useState({
     name: '',
     manufacturer: '',
     price: '',
-    photoUrl: 'https://picsum.photos/seed/newmed/200/200'
+    photoUrl: '/photos/medicine1.jpg'
   });
 
-  // Модальное окно редактирования
   const [editingItem, setEditingItem] = useState(null);
   const [editForm, setEditForm] = useState({});
 
@@ -38,9 +39,6 @@ function MedicinesPage() {
     dispatch(fetchMedicines({ page, limit: 10, search }));
   }, [dispatch, page, search]);
 
-  // ────────────────────────────────────
-  // СОЗДАНИЕ
-  // ────────────────────────────────────
   const handleCreate = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.manufacturer || !formData.price) {
@@ -55,49 +53,33 @@ function MedicinesPage() {
         name: '',
         manufacturer: '',
         price: '',
-        photoUrl: 'https://picsum.photos/seed/newmed/200/200'
+        photoUrl: '/photos/medicine1.jpg'
       });
       dispatch(fetchMedicines({ page, limit: 10, search }));
     });
   };
 
-  // ────────────────────────────────────
-  // ОТКРЫТИЕ РЕДАКТИРОВАНИЯ
-  // ────────────────────────────────────
   const handleOpenEdit = (item) => {
     setEditingItem(item);
     setEditForm({
       name: item.name,
       manufacturer: item.manufacturer,
       price: item.price,
-      photoUrl: item.photoUrl || ''
+      photoUrl: item.photoUrl || '/photos/medicine1.jpg'
     });
   };
 
-  // ────────────────────────────────────
-  // СОХРАНЕНИЕ РЕДАКТИРОВАНИЯ
-  // ────────────────────────────────────
   const handleSaveEdit = (e) => {
     e.preventDefault();
-    if (!editForm.name || !editForm.manufacturer || !editForm.price) {
-      alert('Заполните все поля');
-      return;
-    }
     dispatch(updateMedicine({
       id: editingItem.id,
-      data: {
-        ...editForm,
-        price: parseFloat(editForm.price)
-      }
+      data: { ...editForm, price: parseFloat(editForm.price) }
     })).then(() => {
       setEditingItem(null);
       dispatch(fetchMedicines({ page, limit: 10, search }));
     });
   };
 
-  // ────────────────────────────────────
-  // УДАЛЕНИЕ
-  // ────────────────────────────────────
   const handleDelete = (id, name) => {
     if (window.confirm(`Удалить "${name}"?`)) {
       dispatch(deleteMedicine(id)).then(() => {
@@ -110,6 +92,14 @@ function MedicinesPage() {
     <Container className="py-4">
       <h1 className="mb-4">💊 Лекарства</h1>
 
+      {/* Информация для неадминов */}
+      {!isAdmin && (
+        <Alert variant="info">
+          ℹ️ Вы просматриваете страницу в режиме <strong>«Только чтение»</strong>.
+          {!isAuthenticated && ' Войдите как администратор, чтобы управлять данными.'}
+        </Alert>
+      )}
+
       {error && <Alert variant="danger">Ошибка: {error}</Alert>}
 
       <Form.Control
@@ -120,45 +110,47 @@ function MedicinesPage() {
         className="mb-3"
       />
 
-      {/* Форма создания */}
-      <div className="bg-light p-3 rounded mb-4">
-        <h5>➕ Добавить лекарство</h5>
-        <Form onSubmit={handleCreate} className="row g-2">
-          <div className="col-md-3">
-            <Form.Control
-              placeholder="Название"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-          <div className="col-md-3">
-            <Form.Control
-              placeholder="Производитель"
-              value={formData.manufacturer}
-              onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })}
-            />
-          </div>
-          <div className="col-md-2">
-            <Form.Control
-              type="number"
-              step="0.01"
-              placeholder="Цена"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            />
-          </div>
-          <div className="col-md-2">
-            <Form.Control
-              placeholder="URL фото"
-              value={formData.photoUrl}
-              onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
-            />
-          </div>
-          <div className="col-md-2">
-            <Button type="submit" variant="primary" className="w-100">Добавить</Button>
-          </div>
-        </Form>
-      </div>
+      {/* Форма создания — только для админа */}
+      {isAdmin && (
+        <div className="bg-light p-3 rounded mb-4">
+          <h5>➕ Добавить лекарство</h5>
+          <Form onSubmit={handleCreate} className="row g-2">
+            <div className="col-md-3">
+              <Form.Control
+                placeholder="Название"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div className="col-md-3">
+              <Form.Control
+                placeholder="Производитель"
+                value={formData.manufacturer}
+                onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })}
+              />
+            </div>
+            <div className="col-md-2">
+              <Form.Control
+                type="number"
+                step="0.01"
+                placeholder="Цена"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              />
+            </div>
+            <div className="col-md-2">
+              <Form.Control
+                placeholder="URL фото"
+                value={formData.photoUrl}
+                onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
+              />
+            </div>
+            <div className="col-md-2">
+              <Button type="submit" variant="primary" className="w-100">Добавить</Button>
+            </div>
+          </Form>
+        </div>
+      )}
 
       {loading && <p>Загрузка...</p>}
 
@@ -176,7 +168,7 @@ function MedicinesPage() {
                 <th>Название</th>
                 <th>Производитель</th>
                 <th>Цена</th>
-                <th>Действия</th>
+                {isAdmin && <th>Действия</th>}
               </tr>
             </thead>
             <tbody>
@@ -185,33 +177,25 @@ function MedicinesPage() {
                   <td>{m.id}</td>
                   <td>
                     <img
-                      src={m.photoUrl || 'https://picsum.photos/seed/med/50/50'}
+                      src={m.photoUrl || '/photos/medicine1.jpg'}
                       alt={m.name}
                       style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
+                      onError={(e) => { e.target.src = '/photos/medicine1.jpg'; }}
                     />
                   </td>
                   <td>{m.name}</td>
                   <td>{m.manufacturer}</td>
                   <td><Badge bg="success">{parseFloat(m.price).toFixed(2)} руб.</Badge></td>
-                  <td>
-                    <Button
-                      size="sm"
-                      variant="warning"
-                      className="me-2"
-                      onClick={() => handleOpenEdit(m)}
-                      title="Редактировать"
-                    >
-                      ✏️
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onClick={() => handleDelete(m.id, m.name)}
-                      title="Удалить"
-                    >
-                      🗑️
-                    </Button>
-                  </td>
+                  {isAdmin && (
+                    <td>
+                      <Button size="sm" variant="warning" className="me-2" onClick={() => handleOpenEdit(m)}>
+                        ✏️
+                      </Button>
+                      <Button size="sm" variant="danger" onClick={() => handleDelete(m.id, m.name)}>
+                        🗑️
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -222,11 +206,7 @@ function MedicinesPage() {
               <Pagination>
                 <Pagination.Prev disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)} />
                 {[...Array(totalPages)].map((_, i) => (
-                  <Pagination.Item
-                    key={i + 1}
-                    active={i + 1 === currentPage}
-                    onClick={() => setPage(i + 1)}
-                  >
+                  <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => setPage(i + 1)}>
                     {i + 1}
                   </Pagination.Item>
                 ))}
@@ -237,63 +217,55 @@ function MedicinesPage() {
         </>
       )}
 
-      {/* Модальное окно редактирования */}
-      <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>✏️ Редактировать: {editingItem?.name}</Modal.Title>
-        </Modal.Header>
-        <Form onSubmit={handleSaveEdit}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label>Название</Form.Label>
-              <Form.Control
-                value={editForm.name || ''}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Производитель</Form.Label>
-              <Form.Control
-                value={editForm.manufacturer || ''}
-                onChange={(e) => setEditForm({ ...editForm, manufacturer: e.target.value })}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Цена (руб.)</Form.Label>
-              <Form.Control
-                type="number"
-                step="0.01"
-                value={editForm.price || ''}
-                onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>URL фото</Form.Label>
-              <Form.Control
-                value={editForm.photoUrl || ''}
-                onChange={(e) => setEditForm({ ...editForm, photoUrl: e.target.value })}
-              />
-            </Form.Group>
-            {editForm.photoUrl && (
-              <div className="text-center">
-                <img
-                  src={editForm.photoUrl}
-                  alt="Preview"
-                  style={{ maxHeight: 120, objectFit: 'cover', borderRadius: 8 }}
-                  onError={(e) => { e.target.style.display = 'none'; }}
+      {/* Модальное окно редактирования — только для админа */}
+      {isAdmin && (
+        <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>✏️ Редактировать: {editingItem?.name}</Modal.Title>
+          </Modal.Header>
+          <Form onSubmit={handleSaveEdit}>
+            <Modal.Body>
+              <Form.Group className="mb-3">
+                <Form.Label>Название</Form.Label>
+                <Form.Control
+                  value={editForm.name || ''}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  required
                 />
-              </div>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
-            <Button variant="primary" type="submit">💾 Сохранить</Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Производитель</Form.Label>
+                <Form.Control
+                  value={editForm.manufacturer || ''}
+                  onChange={(e) => setEditForm({ ...editForm, manufacturer: e.target.value })}
+                  required
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Цена (руб.)</Form.Label>
+                <Form.Control
+                  type="number"
+                  step="0.01"
+                  value={editForm.price || ''}
+                  onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                  required
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>URL фото</Form.Label>
+                <Form.Control
+                  value={editForm.photoUrl || '/photos/medicine1.jpg'}
+                  onChange={(e) => setEditForm({ ...editForm, photoUrl: e.target.value })}
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
+              <Button variant="primary" type="submit">💾 Сохранить</Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      )}
     </Container>
   );
 }

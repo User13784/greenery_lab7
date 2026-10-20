@@ -5,8 +5,7 @@ import {
   fetchOrdersReport,
   selectReportData,
   selectReportLoading,
-  selectReportError,
-  selectReportYear
+  selectReportError
 } from '../../features/reports/reportsSlice';
 
 function ReportsPage() {
@@ -14,18 +13,18 @@ function ReportsPage() {
   const data = useSelector(selectReportData);
   const loading = useSelector(selectReportLoading);
   const error = useSelector(selectReportError);
-  const currentYear = useSelector(selectReportYear);
 
-  const [year, setYear] = useState(currentYear);
+  // Год по умолчанию — 2026 (текущий)
+  const [year, setYear] = useState(2026);
 
-  // Загружаем отчёт при первом рендере
+  // Загружаем отчёт за 2026 при первом рендере
   useEffect(() => {
-    dispatch(fetchOrdersReport(year));
-  }, [dispatch]); // только при монтировании
+    dispatch(fetchOrdersReport(2026));
+  }, [dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(fetchOrdersReport(year));
+    dispatch(fetchOrdersReport(parseInt(year)));
   };
 
   return (
@@ -38,13 +37,14 @@ function ReportsPage() {
           <Form onSubmit={handleSubmit} className="row g-2 align-items-end">
             <div className="col-md-4">
               <Form.Label>Год:</Form.Label>
-              <Form.Control
-                type="number"
+              <Form.Select
                 value={year}
-                onChange={(e) => setYear(e.target.value)}
-                min="2000"
-                max="2100"
-              />
+                onChange={(e) => setYear(parseInt(e.target.value))}
+              >
+                {[2024, 2025, 2026, 2027, 2028].map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </Form.Select>
             </div>
             <div className="col-md-3">
               <Button type="submit" variant="primary" disabled={loading}>
@@ -65,8 +65,8 @@ function ReportsPage() {
       )}
 
       {!loading && data && data.report.length === 0 && (
-        <Alert variant="info">
-          За {data.year} год заявок не найдено.
+        <Alert variant="warning">
+          ⚠️ За <strong>{data.year}</strong> год заявок не найдено.
         </Alert>
       )}
 

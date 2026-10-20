@@ -1,24 +1,43 @@
 const express = require('express');
 const router = express.Router();
 const { Medicine } = require('../models');
-const { Op } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 
-// GET /api/medicines — список с пагинацией, сортировкой, фильтрацией, поиском
+/**
+ * GET /api/medicines
+ * Пагинация, сортировка, фильтрация, поиск
+ */
 router.get('/', async (req, res) => {
   try {
-    const { page = 1, limit = 10, sort = 'id', order = 'ASC',
-            search, manufacturer, minPrice, maxPrice } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sort = 'id',
+      order = 'ASC',
+      search,
+      manufacturer,
+      minPrice,
+      maxPrice
+    } = req.query;
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const where = {};
 
-    // Поиск по нескольким полям
+    // Поиск по нескольким полям (регистронезависимый — через LOWER)
     if (search) {
+      const searchLower = search.toLowerCase();
       where[Op.or] = [
-        { name: { [Op.like]: `%${search}%` } },
-        { manufacturer: { [Op.like]: `%${search}%` } }
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.col('name')),
+          { [Op.like]: `%${searchLower}%` }
+        ),
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.col('manufacturer')),
+          { [Op.like]: `%${searchLower}%` }
+        )
       ];
     }
+
     // Фильтрация по нескольким полям
     if (manufacturer) where.manufacturer = manufacturer;
     if (minPrice || maxPrice) {
@@ -45,7 +64,9 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /:id — детальная информация
+/**
+ * GET /api/medicines/:id — детальная информация
+ */
 router.get('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -56,7 +77,9 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// HEAD — проверка существования
+/**
+ * HEAD /api/medicines/:id — проверка существования
+ */
 router.head('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -66,7 +89,9 @@ router.head('/:id', async (req, res) => {
   }
 });
 
-// POST — создать
+/**
+ * POST /api/medicines — создание
+ */
 router.post('/', async (req, res) => {
   try {
     const item = await Medicine.create(req.body);
@@ -76,7 +101,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT — обновить
+/**
+ * PUT /api/medicines/:id — обновление
+ */
 router.put('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -88,7 +115,9 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE
+/**
+ * DELETE /api/medicines/:id — удаление
+ */
 router.delete('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);

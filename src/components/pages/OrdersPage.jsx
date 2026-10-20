@@ -12,6 +12,7 @@ import {
   selectOrdersPagination
 } from '../../features/orders/ordersSlice';
 import { fetchPharmacies, selectPharmacies } from '../../features/pharmacies/pharmaciesSlice';
+import { selectIsAdmin, selectIsAuthenticated } from '../../features/auth/authSlice';
 
 function OrdersPage() {
   const dispatch = useDispatch();
@@ -20,6 +21,8 @@ function OrdersPage() {
   const loading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
   const { totalPages, currentPage } = useSelector(selectOrdersPagination);
+  const isAdmin = useSelector(selectIsAdmin);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [page, setPage] = useState(1);
 
@@ -97,41 +100,51 @@ function OrdersPage() {
     <Container className="py-4">
       <h1 className="mb-4">📋 Заявки</h1>
 
+      {!isAdmin && (
+        <Alert variant="info">
+          ℹ️ Режим <strong>«Только чтение»</strong>.
+          {!isAuthenticated && ' Войдите как администратор, чтобы управлять данными.'}
+        </Alert>
+      )}
+
       {error && <Alert variant="danger">Ошибка: {error}</Alert>}
 
-      <div className="bg-light p-3 rounded mb-4">
-        <h5>➕ Добавить заявку</h5>
-        <Form onSubmit={handleCreate} className="row g-2">
-          <div className="col-md-4">
-            <Form.Select
-              value={formData.pharmacyId}
-              onChange={(e) => setFormData({ ...formData, pharmacyId: e.target.value })}
-            >
-              <option value="">— Выберите аптеку —</option>
-              {pharmacies.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </Form.Select>
-          </div>
-          <div className="col-md-3">
-            <Form.Control
-              type="date"
-              value={formData.createdDate}
-              onChange={(e) => setFormData({ ...formData, createdDate: e.target.value })}
-            />
-          </div>
-          <div className="col-md-3">
-            <Form.Control
-              type="date"
-              value={formData.dueDate}
-              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-            />
-          </div>
-          <div className="col-md-2">
-            <Button type="submit" variant="primary" className="w-100">Добавить</Button>
-          </div>
-        </Form>
-      </div>
+      {/* Форма создания — только для админа */}
+      {isAdmin && (
+        <div className="bg-light p-3 rounded mb-4">
+          <h5>➕ Добавить заявку</h5>
+          <Form onSubmit={handleCreate} className="row g-2">
+            <div className="col-md-4">
+              <Form.Select
+                value={formData.pharmacyId}
+                onChange={(e) => setFormData({ ...formData, pharmacyId: e.target.value })}
+              >
+                <option value="">— Выберите аптеку —</option>
+                {pharmacies.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </Form.Select>
+            </div>
+            <div className="col-md-3">
+              <Form.Control
+                type="date"
+                value={formData.createdDate}
+                onChange={(e) => setFormData({ ...formData, createdDate: e.target.value })}
+              />
+            </div>
+            <div className="col-md-3">
+              <Form.Control
+                type="date"
+                value={formData.dueDate}
+                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+              />
+            </div>
+            <div className="col-md-2">
+              <Button type="submit" variant="primary" className="w-100">Добавить</Button>
+            </div>
+          </Form>
+        </div>
+      )}
 
       {loading && <p>Загрузка...</p>}
 
@@ -149,7 +162,7 @@ function OrdersPage() {
                 <th>Дата составления</th>
                 <th>Дата выполнения</th>
                 <th>Закупок</th>
-                <th>Действия</th>
+                {isAdmin && <th>Действия</th>}
               </tr>
             </thead>
             <tbody>
@@ -162,23 +175,16 @@ function OrdersPage() {
                   <td>
                     <Badge bg="info">{o.purchases?.length || 0}</Badge>
                   </td>
-                  <td>
-                    <Button
-                      size="sm"
-                      variant="warning"
-                      className="me-2"
-                      onClick={() => handleOpenEdit(o)}
-                    >
-                      ✏️
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onClick={() => handleDelete(o.id)}
-                    >
-                      🗑️
-                    </Button>
-                  </td>
+                  {isAdmin && (
+                    <td>
+                      <Button size="sm" variant="warning" className="me-2" onClick={() => handleOpenEdit(o)}>
+                        ✏️
+                      </Button>
+                      <Button size="sm" variant="danger" onClick={() => handleDelete(o.id)}>
+                        🗑️
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -200,50 +206,53 @@ function OrdersPage() {
         </>
       )}
 
-      <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>✏️ Редактировать заявку №{editingItem?.id}</Modal.Title>
-        </Modal.Header>
-        <Form onSubmit={handleSaveEdit}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label>Аптека</Form.Label>
-              <Form.Select
-                value={editForm.pharmacyId || ''}
-                onChange={(e) => setEditForm({ ...editForm, pharmacyId: e.target.value })}
-                required
-              >
-                <option value="">— Выберите аптеку —</option>
-                {pharmacies.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Дата составления</Form.Label>
-              <Form.Control
-                type="date"
-                value={editForm.createdDate || ''}
-                onChange={(e) => setEditForm({ ...editForm, createdDate: e.target.value })}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Дата выполнения</Form.Label>
-              <Form.Control
-                type="date"
-                value={editForm.dueDate || ''}
-                onChange={(e) => setEditForm({ ...editForm, dueDate: e.target.value })}
-                required
-              />
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
-            <Button variant="primary" type="submit">💾 Сохранить</Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+      {/* Модальное окно редактирования — только для админа */}
+      {isAdmin && (
+        <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>✏️ Редактировать заявку №{editingItem?.id}</Modal.Title>
+          </Modal.Header>
+          <Form onSubmit={handleSaveEdit}>
+            <Modal.Body>
+              <Form.Group className="mb-3">
+                <Form.Label>Аптека</Form.Label>
+                <Form.Select
+                  value={editForm.pharmacyId || ''}
+                  onChange={(e) => setEditForm({ ...editForm, pharmacyId: e.target.value })}
+                  required
+                >
+                  <option value="">— Выберите аптеку —</option>
+                  {pharmacies.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Дата составления</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={editForm.createdDate || ''}
+                  onChange={(e) => setEditForm({ ...editForm, createdDate: e.target.value })}
+                  required
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Дата выполнения</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={editForm.dueDate || ''}
+                  onChange={(e) => setEditForm({ ...editForm, dueDate: e.target.value })}
+                  required
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setEditingItem(null)}>Отмена</Button>
+              <Button variant="primary" type="submit">💾 Сохранить</Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      )}
     </Container>
   );
 }
