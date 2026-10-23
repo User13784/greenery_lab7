@@ -1,5 +1,5 @@
 {
-  "name": "3rd-year-laboratory-assignments",
+  "name": "greenery-client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,6 +8,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
     "i18next": "^26.4.2",
     "i18next-browser-languagedetector": "^8.2.1",
@@ -16,6 +17,7 @@
     "react-dom": "^19.2.8",
     "react-i18next": "^17.0.14",
     "react-redux": "^9.3.0",
+    "react-router-dom": "^7.18.3",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -23,8 +25,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "server": "json-server server/db.json --port 3001"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -45,9 +46,6 @@
     ]
   },
   "devDependencies": {
-    "axios": "^1.20.0",
-    "concurrently": "^10.0.5",
-    "json-server": "^1.0.0-beta.15",
-    "react-router-dom": "^7.18.3"
+    "ajv": "^8.20.0"
   }
 }
