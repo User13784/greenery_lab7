@@ -10,14 +10,12 @@ function Sidebar({ companyName = "Greenery" }) {
   const isAdmin = useAppSelector(selectIsAdmin);
 
   const menuItems = [
-    // Магазин мебели
     { path: '/', icon: 'home', label: t('home') },
     { path: '/catalog', icon: 'shop', label: t('shop') },
     { path: '/favorites', icon: 'heart', label: t('favorites') },
     { path: '/feedback', icon: 'blog', label: t('reviews') },
     { path: '/cart', icon: 'cart', label: t('cart') },
 
-    // Аптечный склад (Лабораторная 7)
     { path: '/medicines', emoji: '💊', label: 'Лекарства' },
     { path: '/pharmacies', emoji: '🏥', label: 'Аптеки' },
     { path: '/orders', emoji: '📋', label: 'Заявки' },

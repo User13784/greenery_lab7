@@ -3,7 +3,6 @@ const router = express.Router();
 const { Order, Pharmacy, Purchase, Medicine } = require('../models');
 const { Op } = require('sequelize');
 
-// GET /api/reports/orders?year=2024
 router.get('/orders', async (req, res) => {
   try {
     const year = parseInt(req.query.year) || new Date().getFullYear();

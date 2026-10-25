@@ -8,7 +8,6 @@ export function ThemeProvider({ children }) {
   });
 
   useEffect(() => {
-    // Применяем тему к body
     if (theme === 'dark') {
       document.body.classList.add('dark-theme');
     } else {

@@ -3,17 +3,13 @@ const router = express.Router();
 const { Pharmacy, Order } = require('../models');
 const { Sequelize, Op } = require('sequelize');
 
-/**
- * GET /api/pharmacies
- * Пагинация, сортировка, поиск
- */
+
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, sort = 'id', order = 'ASC', search } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const where = {};
 
-    // Поиск по нескольким полям (регистронезависимый)
     if (search) {
       const searchLower = search.toLowerCase();
       where[Op.or] = [
@@ -46,9 +42,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * GET /api/pharmacies/:id — детальная информация + заявки
- */
+
 router.get('/:id', async (req, res) => {
   try {
     const item = await Pharmacy.findByPk(req.params.id, {
@@ -61,9 +55,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-/**
- * HEAD /api/pharmacies/:id — проверка существования
- */
+
 router.head('/:id', async (req, res) => {
   try {
     const item = await Pharmacy.findByPk(req.params.id);
@@ -73,9 +65,7 @@ router.head('/:id', async (req, res) => {
   }
 });
 
-/**
- * POST /api/pharmacies — создание
- */
+
 router.post('/', async (req, res) => {
   try {
     const item = await Pharmacy.create(req.body);
@@ -85,9 +75,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-/**
- * PUT /api/pharmacies/:id — обновление
- */
+
 router.put('/:id', async (req, res) => {
   try {
     const item = await Pharmacy.findByPk(req.params.id);
@@ -99,9 +87,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-/**
- * DELETE /api/pharmacies/:id — удаление
- */
+
 router.delete('/:id', async (req, res) => {
   try {
     const item = await Pharmacy.findByPk(req.params.id);

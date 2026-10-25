@@ -1,4 +1,3 @@
-// Утилиты для работы с авторизацией
 
 export function getCurrentUser() {
   const saved = localStorage.getItem('currentUser');
@@ -24,14 +23,12 @@ export function logout() {
   window.location.reload();
 }
 
-// Показать сообщение о необходимости входа
 export function showLoginRequired() {
   return window.confirm(
     '🔒 Для этого действия необходимо войти в аккаунт.\n\nПерейти на страницу входа?'
   );
 }
 
-// Показать сообщение о необходимости прав администратора
 export function showAdminRequired() {
   alert('⛔ Это действие доступно только администратору');
 }

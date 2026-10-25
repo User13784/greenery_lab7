@@ -92,7 +92,6 @@ function MedicinesPage() {
     <Container className="py-4">
       <h1 className="mb-4">💊 Лекарства</h1>
 
-      {/* Информация для неадминов */}
       {!isAdmin && (
         <Alert variant="info">
           ℹ️ Вы просматриваете страницу в режиме <strong>«Только чтение»</strong>.
@@ -110,7 +109,6 @@ function MedicinesPage() {
         className="mb-3"
       />
 
-      {/* Форма создания — только для админа */}
       {isAdmin && (
         <div className="bg-light p-3 rounded mb-4">
           <h5>➕ Добавить лекарство</h5>
@@ -217,7 +215,6 @@ function MedicinesPage() {
         </>
       )}
 
-      {/* Модальное окно редактирования — только для админа */}
       {isAdmin && (
         <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
           <Modal.Header closeButton>

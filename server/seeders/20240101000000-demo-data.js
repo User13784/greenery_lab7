@@ -5,9 +5,6 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     const now = new Date();
 
-    // ────────────────────────────────────────────
-    // 1. АПТЕКИ (10 штук)
-    // ────────────────────────────────────────────
     const pharmacies = [];
     const streetNames = ['ул. Ленина', 'ул. Советская', 'пр. Независимости', 'ул. Пушкина', 'ул. Гагарина'];
     for (let i = 1; i <= 10; i++) {
@@ -22,9 +19,6 @@ photoUrl: '/photos/pharmacy.svg',
     }
     await queryInterface.bulkInsert('Pharmacies', pharmacies);
 
-    // ────────────────────────────────────────────
-    // 2. ЛЕКАРСТВА (20 штук)
-    // ────────────────────────────────────────────
     const medicines = [];
     const medicineNames = [
       'Аспирин', 'Анальгин', 'Парацетамол', 'Ибупрофен', 'Нурофен',
@@ -46,9 +40,7 @@ photoUrl: '/photos/medicine.svg',
     }
     await queryInterface.bulkInsert('Medicines', medicines);
 
-    // ────────────────────────────────────────────
-    // 3. ЗАЯВКИ (10 штук)
-    // ────────────────────────────────────────────
+
     const orders = [];
     for (let i = 1; i <= 10; i++) {
       orders.push({
@@ -61,9 +53,7 @@ photoUrl: '/photos/medicine.svg',
     }
     await queryInterface.bulkInsert('Orders', orders);
 
-    // ────────────────────────────────────────────
-    // 4. ЗАКУПКИ (30 штук)
-    // ────────────────────────────────────────────
+
     const purchases = [];
     for (let i = 1; i <= 30; i++) {
       purchases.push({

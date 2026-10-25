@@ -74,8 +74,6 @@ function RegisterPage() {
       return;
     }
 
-    // ⚠️ Регистрация новых пользователей пока не сохраняется
-    // (потому что нет бэкенда). Данные хранятся только в Redux.
     const newUser = {
       id: Date.now().toString(),
       ...registerData,

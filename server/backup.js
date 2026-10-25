@@ -9,6 +9,5 @@ if (!fs.existsSync(dbPath)) {
   process.exit(1);
 }
 
-// Копируем файл целиком
 fs.copyFileSync(dbPath, backupPath);
 console.log(`✅ Backup сохранён: ${backupPath}`);

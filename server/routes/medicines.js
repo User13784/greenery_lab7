@@ -3,10 +3,7 @@ const router = express.Router();
 const { Medicine } = require('../models');
 const { Sequelize, Op } = require('sequelize');
 
-/**
- * GET /api/medicines
- * Пагинация, сортировка, фильтрация, поиск
- */
+
 router.get('/', async (req, res) => {
   try {
     const {
@@ -23,7 +20,6 @@ router.get('/', async (req, res) => {
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const where = {};
 
-    // Поиск по нескольким полям (регистронезависимый — через LOWER)
     if (search) {
       const searchLower = search.toLowerCase();
       where[Op.or] = [
@@ -38,7 +34,6 @@ router.get('/', async (req, res) => {
       ];
     }
 
-    // Фильтрация по нескольким полям
     if (manufacturer) where.manufacturer = manufacturer;
     if (minPrice || maxPrice) {
       where.price = {};
@@ -64,9 +59,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * GET /api/medicines/:id — детальная информация
- */
+
 router.get('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -77,9 +70,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-/**
- * HEAD /api/medicines/:id — проверка существования
- */
+
 router.head('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -89,9 +80,7 @@ router.head('/:id', async (req, res) => {
   }
 });
 
-/**
- * POST /api/medicines — создание
- */
+
 router.post('/', async (req, res) => {
   try {
     const item = await Medicine.create(req.body);
@@ -101,9 +90,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-/**
- * PUT /api/medicines/:id — обновление
- */
+
 router.put('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -115,9 +102,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-/**
- * DELETE /api/medicines/:id — удаление
- */
+
 router.delete('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);

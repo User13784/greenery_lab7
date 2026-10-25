@@ -14,10 +14,8 @@ function ReportsPage() {
   const loading = useSelector(selectReportLoading);
   const error = useSelector(selectReportError);
 
-  // Год по умолчанию — 2026 (текущий)
   const [year, setYear] = useState(2026);
 
-  // Загружаем отчёт за 2026 при первом рендере
   useEffect(() => {
     dispatch(fetchOrdersReport(2026));
   }, [dispatch]);

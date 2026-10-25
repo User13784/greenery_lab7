@@ -93,7 +93,6 @@ function Header() {
           </Nav>
 
           <Nav className="align-items-center">
-            {/* Ссылки на аптечный склад — видны ВСЕМ */}
             <Nav.Link as={Link} to="/medicines">
               💊 Лекарства
             </Nav.Link>

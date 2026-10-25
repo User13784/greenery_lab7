@@ -14,7 +14,6 @@ const { Pharmacy, Medicine, Order, Purchase } = require('./models');
   console.log(`  ─────────────────`);
   console.log(`  ИТОГО:      ${pharmacies + medicines + orders + purchases}`);
 
-  // Показать пример
   const sample = await Medicine.findOne();
   console.log('\n💊 Пример лекарства:', sample?.name, '—', sample?.price, 'руб.');
 

@@ -60,7 +60,6 @@ function AddProductModal({ isOpen, onClose }) {
         isFavorite: false
       };
 
-      // ✅ Синхронный dispatch — без async/await
       dispatch(addProduct(newProduct));
 
       setSuccess(true);

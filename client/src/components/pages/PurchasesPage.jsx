@@ -120,7 +120,6 @@ function PurchasesPage() {
 
       {error && <Alert variant="danger">Ошибка: {error}</Alert>}
 
-      {/* Форма создания — только для админа */}
       {isAdmin && (
         <div className="bg-light p-3 rounded mb-4">
           <h5>➕ Добавить закупку</h5>
@@ -225,7 +224,6 @@ function PurchasesPage() {
         </>
       )}
 
-      {/* Модальное окно редактирования — только для админа */}
       {isAdmin && (
         <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
           <Modal.Header closeButton>

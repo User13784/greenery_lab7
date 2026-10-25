@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { reportsAPI } from '../../services/api';
 
-// Асинхронный thunk — загрузка отчёта по заявкам за год
 export const fetchOrdersReport = createAsyncThunk(
   'reports/fetchOrdersReport',
   async (year, { rejectWithValue }) => {
@@ -14,7 +13,7 @@ export const fetchOrdersReport = createAsyncThunk(
 );
 
 const initialState = {
-  data: null,       // { year, report: [...], grandTotal, grandQuantity }
+  data: null,       
   loading: false,
   error: null,
   year: new Date().getFullYear()

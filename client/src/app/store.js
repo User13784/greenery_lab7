@@ -8,7 +8,7 @@ import medicinesReducer from '../features/medicines/medicinesSlice';
 import pharmaciesReducer from '../features/pharmacies/pharmaciesSlice';
 import ordersReducer from '../features/orders/ordersSlice';
 import purchasesReducer from '../features/purchases/purchasesSlice';
-import reportsReducer from '../features/reports/reportsSlice';   // ← ДОБАВИТЬ
+import reportsReducer from '../features/reports/reportsSlice';   
 
 export const store = configureStore({
   reducer: {
@@ -21,7 +21,7 @@ export const store = configureStore({
     pharmacies: pharmaciesReducer,
     orders: ordersReducer,
     purchases: purchasesReducer,
-    reports: reportsReducer                                     // ← ДОБАВИТЬ
+    reports: reportsReducer                                     
   },
   devTools: process.env.NODE_ENV !== 'production'
 });

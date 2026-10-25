@@ -23,7 +23,6 @@ export const createMedicine = createAsyncThunk(
   }
 );
 
-// 👇 ДОБАВИТЬ, если нет
 export const updateMedicine = createAsyncThunk(
   'medicines/updateMedicine',
   async ({ id, data }, { rejectWithValue }) => {
@@ -77,7 +76,6 @@ const medicinesSlice = createSlice({
       .addCase(createMedicine.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
       })
-      // 👇 ДОБАВИТЬ, если нет
       .addCase(updateMedicine.fulfilled, (state, action) => {
         const idx = state.items.findIndex(m => m.id === action.payload.id);
         if (idx !== -1) state.items[idx] = action.payload;
