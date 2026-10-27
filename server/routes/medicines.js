@@ -2,20 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { Medicine } = require('../models');
 const { Sequelize, Op } = require('sequelize');
+const { authenticateToken, authorizeRole } = require('../middleware/auth');
 
-
+// GET /api/medicines — список (публичный)
 router.get('/', async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      sort = 'id',
-      order = 'ASC',
-      search,
-      manufacturer,
-      minPrice,
-      maxPrice
-    } = req.query;
+    const { page = 1, limit = 10, sort = 'id', order = 'ASC',
+            search, manufacturer, minPrice, maxPrice } = req.query;
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const where = {};
@@ -59,7 +52,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-
+// GET /api/medicines/:id — детали (публичный)
 router.get('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -70,7 +63,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-
+// HEAD /api/medicines/:id — проверка (публичный)
 router.head('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -80,8 +73,8 @@ router.head('/:id', async (req, res) => {
   }
 });
 
-
-router.post('/', async (req, res) => {
+// POST /api/medicines — создание (только админ)
+router.post('/', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Medicine.create(req.body);
     res.status(201).json(item);
@@ -90,8 +83,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-
-router.put('/:id', async (req, res) => {
+// PUT /api/medicines/:id — обновление (только админ)
+router.put('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'Лекарство не найдено' });
@@ -102,8 +95,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
-router.delete('/:id', async (req, res) => {
+// DELETE /api/medicines/:id — удаление (только админ)
+router.delete('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'Лекарство не найдено' });

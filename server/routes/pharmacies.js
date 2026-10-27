@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { Pharmacy, Order } = require('../models');
 const { Sequelize, Op } = require('sequelize');
+const { authenticateToken, authorizeRole } = require('../middleware/auth');
 
-
+// GET /api/pharmacies — список (публичный)
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, sort = 'id', order = 'ASC', search } = req.query;
@@ -42,7 +43,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-
+// GET /api/pharmacies/:id — детали + заявки (публичный)
 router.get('/:id', async (req, res) => {
   try {
     const item = await Pharmacy.findByPk(req.params.id, {
@@ -55,7 +56,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-
+// HEAD /api/pharmacies/:id — проверка (публичный)
 router.head('/:id', async (req, res) => {
   try {
     const item = await Pharmacy.findByPk(req.params.id);
@@ -65,8 +66,8 @@ router.head('/:id', async (req, res) => {
   }
 });
 
-
-router.post('/', async (req, res) => {
+// POST /api/pharmacies — создание (только админ)
+router.post('/', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Pharmacy.create(req.body);
     res.status(201).json(item);
@@ -75,8 +76,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-
-router.put('/:id', async (req, res) => {
+// PUT /api/pharmacies/:id — обновление (только админ)
+router.put('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Pharmacy.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'Аптека не найдена' });
@@ -87,8 +88,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
-router.delete('/:id', async (req, res) => {
+// DELETE /api/pharmacies/:id — удаление (только админ)
+router.delete('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Pharmacy.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'Аптека не найдена' });
