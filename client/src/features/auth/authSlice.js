@@ -1,11 +1,38 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { initialUsers } from '../../data/initialData';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { authAPI } from '../../services/api';
 
+// ────────────────────────────────────────
+// Thunks
+// ────────────────────────────────────────
+export const loginUser = createAsyncThunk(
+  'auth/login',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      return await authAPI.login(credentials);
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || err.message);
+    }
+  }
+);
+
+export const registerUser = createAsyncThunk(
+  'auth/register',
+  async (data, { rejectWithValue }) => {
+    try {
+      return await authAPI.register(data);
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || err.message);
+    }
+  }
+);
+
+// ────────────────────────────────────────
+// Slice
+// ────────────────────────────────────────
 const initialState = {
-  user: null,
-  isAuthenticated: false,
-  isAdmin: false,
-  users: initialUsers,
+  user: JSON.parse(localStorage.getItem('user') || 'null'),
+  token: localStorage.getItem('token') || null,
+  isAuthenticated: !!localStorage.getItem('token'),
   loading: false,
   error: null
 };
@@ -14,29 +41,60 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginSuccess(state, action) {
-      state.user = action.payload;
-      state.isAuthenticated = true;
-      state.isAdmin = action.payload.role === 'admin';
-      state.error = null;
-    },
     logout(state) {
       state.user = null;
+      state.token = null;
       state.isAuthenticated = false;
-      state.isAdmin = false;
+      state.error = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     },
-    setError(state, action) {
-      state.error = action.payload;
+    clearError(state) {
+      state.error = null;
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      // LOGIN
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        localStorage.setItem('token', action.payload.token);
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // REGISTER
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   }
 });
 
-export const { loginSuccess, logout, setError } = authSlice.actions;
+export const { logout, clearError } = authSlice.actions;
 
 export const selectUser = (state) => state.auth.user;
-export const selectUserId = (state) => state.auth.user?.id || null;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
-export const selectIsAdmin = (state) => state.auth.isAdmin;
-export const selectAllUsers = (state) => state.auth.users;
+export const selectIsAdmin = (state) => state.auth.user?.role === 'admin';
+export const selectAuthError = (state) => state.auth.error;
+export const selectAuthLoading = (state) => state.auth.loading;
 
 export default authSlice.reducer;
