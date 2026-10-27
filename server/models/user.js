@@ -4,7 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // Пока не связываем — на будущее
+      // Связи — на будущее
     }
   }
   User.init({
@@ -21,8 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notEmpty: { msg: 'Пароль обязателен' },
-        len: { args: [60, 255], msg: 'Пароль хранится как хеш' }
+        notEmpty: { msg: 'Пароль обязателен' }
       }
     },
     role: {
@@ -32,6 +31,14 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         isIn: { args: [['user', 'admin']], msg: 'Роль: user или admin' }
       }
+    },
+    resetToken: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    resetTokenExpiry: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,
