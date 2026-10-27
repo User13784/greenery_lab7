@@ -13,6 +13,7 @@ app.use('/api/pharmacies', require('./routes/pharmacies'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/purchases', require('./routes/purchases'));
 app.use('/api/reports', require('./routes/reports'));
+app.use('/api/auth', require('./routes/auth'));
 
 app.get('/', (req, res) => {
   res.json({
