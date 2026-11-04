@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authAPI } from '../../services/api';
 
-// ────────────────────────────────────────
-// Thunks
-// ────────────────────────────────────────
+
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -26,9 +24,7 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// ────────────────────────────────────────
-// Slice
-// ────────────────────────────────────────
+
 const initialState = {
   user: JSON.parse(localStorage.getItem('user') || 'null'),
   token: localStorage.getItem('token') || null,
@@ -55,7 +51,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -73,7 +68,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // REGISTER
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;

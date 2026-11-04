@@ -4,7 +4,6 @@ const { Medicine } = require('../models');
 const { Sequelize, Op } = require('sequelize');
 const { authenticateToken, authorizeRole } = require('../middleware/auth');
 
-// GET /api/medicines — список (публичный)
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, sort = 'id', order = 'ASC',
@@ -52,7 +51,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/medicines/:id — детали (публичный)
 router.get('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -63,7 +61,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// HEAD /api/medicines/:id — проверка (публичный)
 router.head('/:id', async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -73,7 +70,6 @@ router.head('/:id', async (req, res) => {
   }
 });
 
-// POST /api/medicines — создание (только админ)
 router.post('/', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Medicine.create(req.body);
@@ -83,7 +79,6 @@ router.post('/', authenticateToken, authorizeRole('admin'), async (req, res) => 
   }
 });
 
-// PUT /api/medicines/:id — обновление (только админ)
 router.put('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
@@ -95,7 +90,6 @@ router.put('/:id', authenticateToken, authorizeRole('admin'), async (req, res) =
   }
 });
 
-// DELETE /api/medicines/:id — удаление (только админ)
 router.delete('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Medicine.findByPk(req.params.id);
