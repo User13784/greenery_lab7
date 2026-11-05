@@ -4,9 +4,25 @@ const API_URL = 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 10000
 });
 
+// Интерцептор: автоматически добавляет JWT-токен
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ────────────────────────────────────────
+// API для лабораторной №7 и №9
+// ────────────────────────────────────────
 export const medicinesAPI = {
   getAll: (params) => api.get('/medicines', { params }).then(r => r.data),
   getById: (id) => api.get(`/medicines/${id}`).then(r => r.data),
@@ -39,9 +55,19 @@ export const purchasesAPI = {
   delete: (id) => api.delete(`/purchases/${id}`).then(r => r.data)
 };
 
-
 export const reportsAPI = {
   getOrdersReport: (year) => api.get('/reports/orders', { params: { year } }).then(r => r.data)
+};
+
+// ────────────────────────────────────────
+// API для лабораторной №8 (Авторизация)
+// ────────────────────────────────────────
+export const authAPI = {
+  register: (data) => api.post('/auth/register', data).then(r => r.data),
+  login: (data) => api.post('/auth/login', data).then(r => r.data),
+  changePassword: (data) => api.post('/auth/change-password', data).then(r => r.data),
+  forgotPassword: (data) => api.post('/auth/forgot-password', data).then(r => r.data),
+  resetPassword: (data) => api.post('/auth/reset-password', data).then(r => r.data)
 };
 
 export default api;

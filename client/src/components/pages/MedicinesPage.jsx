@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Table, Button, Form, Alert, Badge, Pagination, Modal } from 'react-bootstrap';
+import { Container, Form, Alert, Button, Modal } from 'react-bootstrap';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
@@ -20,6 +20,9 @@ import {
   selectMedicinesPagination
 } from '../../features/medicines/medicinesSlice';
 import { selectIsAdmin, selectIsAuthenticated } from '../../features/auth/authSlice';
+
+// Подключаем новую таблицу
+import MedicinesTable from './MedicinesTable';
 
 // ────────────────────────────────────
 // Схема валидации Yup
@@ -52,7 +55,7 @@ function MedicinesPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
-  // Состояние для редактирования (пока оставляем на useState для простоты)
+  // Состояние для редактирования
   const [editingItem, setEditingItem] = useState(null);
   const [editForm, setEditForm] = useState({});
 
@@ -146,12 +149,12 @@ function MedicinesPage() {
 
     dispatch(createMedicine(payload)).then(() => {
       dispatch(fetchMedicines({ page, limit: 10, search }));
-      reset(); // Сброс формы
+      reset();
     });
   };
 
   // ────────────────────────────────────
-  // РЕДАКТИРОВАНИЕ (старая логика)
+  // РЕДАКТИРОВАНИЕ
   // ────────────────────────────────────
   const handleOpenEdit = (item) => {
     setEditingItem(item);
@@ -184,7 +187,6 @@ function MedicinesPage() {
 
   return (
     <Container className="py-4">
-      {/* Заголовок и кнопки экспорта */}
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h1 className="mb-0">💊 Лекарства</h1>
         <div>
@@ -207,18 +209,17 @@ function MedicinesPage() {
 
       <Form.Control
         type="text"
-        placeholder="🔍 Поиск по названию или производителю..."
+        placeholder="🔍 Поиск на сервере по названию или производителю..."
         value={search}
         onChange={(e) => { setSearch(e.target.value); setPage(1); }}
         className="mb-3"
       />
 
-      {/* ─── НОВАЯ ФОРМА С RHF ─── */}
+      {/* ─── ФОРМА С RHF ─── */}
       {isAdmin && (
         <div className="bg-light p-3 rounded mb-4">
           <h5>➕ Добавить лекарство (React Hook Form)</h5>
           <form onSubmit={handleSubmit(onSubmitCreate)} className="row g-2">
-            
             <div className="col-md-3">
               <label className="form-label">Название *</label>
               <input {...register('name')} className={`form-control ${errors.name ? 'is-invalid' : ''}`} />
@@ -242,7 +243,6 @@ function MedicinesPage() {
               {errors.price && <div className="invalid-feedback">{errors.price.message}</div>}
             </div>
 
-            {/* Зависимое поле: показываем, если цена > 500 */}
             {parseFloat(priceValue) > 500 && (
               <div className="col-md-2">
                 <label className="form-label">Скидка (%)</label>
@@ -265,7 +265,6 @@ function MedicinesPage() {
               {errors.dateReceived && <div className="invalid-feedback">{errors.dateReceived.message}</div>}
             </div>
 
-            {/* Загрузка файла */}
             <div className="col-md-4 mt-3">
               <label className="form-label">Фото (загрузка файла)</label>
               <input
@@ -297,66 +296,17 @@ function MedicinesPage() {
         <Alert variant="info">Лекарства не найдены</Alert>
       )}
 
+      {/* ─── TANSTACK TABLE ─── */}
       {!loading && items.length > 0 && (
-        <>
-          <Table striped bordered hover responsive>
-            <thead className="table-dark">
-              <tr>
-                <th>ID</th>
-                <th>Фото</th>
-                <th>Название</th>
-                <th>Производитель</th>
-                <th>Цена</th>
-                {isAdmin && <th>Действия</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(m => (
-                <tr key={m.id}>
-                  <td>{m.id}</td>
-                  <td>
-                    <img
-                      src={m.photoUrl || '/photos/medicine1.jpg'}
-                      alt={m.name}
-                      style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
-                      onError={(e) => { e.target.src = '/photos/medicine1.jpg'; }}
-                    />
-                  </td>
-                  <td>{m.name}</td>
-                  <td>{m.manufacturer}</td>
-                  <td><Badge bg="success">{parseFloat(m.price).toFixed(2)} руб.</Badge></td>
-                  {isAdmin && (
-                    <td>
-                      <Button size="sm" variant="warning" className="me-2" onClick={() => handleOpenEdit(m)}>
-                        ✏️
-                      </Button>
-                      <Button size="sm" variant="danger" onClick={() => handleDelete(m.id, m.name)}>
-                        🗑️
-                      </Button>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-
-          {totalPages > 1 && (
-            <div className="d-flex justify-content-center">
-              <Pagination>
-                <Pagination.Prev disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)} />
-                {[...Array(totalPages)].map((_, i) => (
-                  <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => setPage(i + 1)}>
-                    {i + 1}
-                  </Pagination.Item>
-                ))}
-                <Pagination.Next disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)} />
-              </Pagination>
-            </div>
-          )}
-        </>
+        <MedicinesTable
+          data={items}
+          onEdit={handleOpenEdit}
+          onDelete={handleDelete}
+          isAdmin={isAdmin}
+        />
       )}
 
-      {/* Модалка редактирования (пока старая логика) */}
+      {/* Модалка редактирования (оставим старую для простоты) */}
       {isAdmin && (
         <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
           <Modal.Header closeButton>
