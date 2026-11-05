@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Table, Button, Form, Alert, Badge, Pagination, Modal } from 'react-bootstrap';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 import {
   fetchMedicines,
   createMedicine,
@@ -25,6 +30,7 @@ function MedicinesPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
+  // Состояние формы создания
   const [formData, setFormData] = useState({
     name: '',
     manufacturer: '',
@@ -32,6 +38,7 @@ function MedicinesPage() {
     photoUrl: '/photos/medicine1.jpg'
   });
 
+  // Состояние для редактирования
   const [editingItem, setEditingItem] = useState(null);
   const [editForm, setEditForm] = useState({});
 
@@ -39,6 +46,61 @@ function MedicinesPage() {
     dispatch(fetchMedicines({ page, limit: 10, search }));
   }, [dispatch, page, search]);
 
+  // ────────────────────────────────────
+  // ЭКСПОРТ В EXCEL
+  // ────────────────────────────────────
+  const exportToExcel = () => {
+    const dataForExcel = items.map(m => ({
+      'ID': m.id,
+      'Название': m.name,
+      'Производитель': m.manufacturer,
+      'Цена (руб.)': parseFloat(m.price),
+    }));
+
+    const totalPrice = items.reduce((sum, m) => sum + parseFloat(m.price), 0);
+    dataForExcel.push({ 'Название': 'ИТОГО:', 'Цена (руб.)': totalPrice });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Лекарства');
+    
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, 'Отчет_Лекарства.xlsx');
+  };
+
+  // ────────────────────────────────────
+  // ЭКСПОРТ В PDF
+  // ────────────────────────────────────
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(16);
+    doc.text('Отчет по лекарствам (Аптечный склад)', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')}`, 14, 28);
+
+    const tableData = items.map(m => [
+      m.id, m.name, m.manufacturer, parseFloat(m.price).toFixed(2)
+    ]);
+
+    const total = items.reduce((sum, m) => sum + parseFloat(m.price), 0);
+    tableData.push(['', 'ИТОГО:', '', total.toFixed(2)]);
+
+    doc.autoTable({
+      startY: 35,
+      head: [['ID', 'Название', 'Производитель', 'Цена (руб.)']],
+      body: tableData,
+      styles: { font: 'helvetica', fontSize: 10 },
+      headStyles: { fillColor: [38, 74, 81] },
+    });
+
+    doc.save('Отчет_Лекарства.pdf');
+  };
+
+  // ────────────────────────────────────
+  // СОЗДАНИЕ
+  // ────────────────────────────────────
   const handleCreate = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.manufacturer || !formData.price) {
@@ -59,6 +121,9 @@ function MedicinesPage() {
     });
   };
 
+  // ────────────────────────────────────
+  // РЕДАКТИРОВАНИЕ
+  // ────────────────────────────────────
   const handleOpenEdit = (item) => {
     setEditingItem(item);
     setEditForm({
@@ -90,7 +155,18 @@ function MedicinesPage() {
 
   return (
     <Container className="py-4">
-      <h1 className="mb-4">💊 Лекарства</h1>
+      {/* Заголовок и кнопки экспорта */}
+      <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h1 className="mb-0">💊 Лекарства</h1>
+        <div>
+          <Button variant="success" className="me-2" onClick={exportToExcel}>
+            📊 Экспорт в Excel
+          </Button>
+          <Button variant="danger" onClick={exportToPDF}>
+            📄 Экспорт в PDF
+          </Button>
+        </div>
+      </div>
 
       {!isAdmin && (
         <Alert variant="info">
