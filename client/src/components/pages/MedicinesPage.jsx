@@ -5,6 +5,9 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 import {
   fetchMedicines,
@@ -18,6 +21,25 @@ import {
 } from '../../features/medicines/medicinesSlice';
 import { selectIsAdmin, selectIsAuthenticated } from '../../features/auth/authSlice';
 
+// ────────────────────────────────────
+// Схема валидации Yup
+// ────────────────────────────────────
+const medicineSchema = yup.object({
+  name: yup.string().required('Название обязательно').min(2, 'Слишком короткое'),
+  manufacturer: yup.string().required('Производитель обязателен'),
+  price: yup.number()
+    .typeError('Должно быть число')
+    .positive('Цена должна быть > 0')
+    .required('Цена обязательна'),
+  discount: yup.number()
+    .min(0, 'Не меньше 0')
+    .max(100, 'Не больше 100')
+    .nullable()
+    .transform((value, originalValue) => originalValue === "" ? null : value),
+  dateReceived: yup.date().required('Дата обязательна'),
+  photoUrl: yup.string().default('/photos/medicine1.jpg'),
+});
+
 function MedicinesPage() {
   const dispatch = useDispatch();
   const items = useSelector(selectMedicines);
@@ -30,17 +52,33 @@ function MedicinesPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
-  // Состояние формы создания
-  const [formData, setFormData] = useState({
-    name: '',
-    manufacturer: '',
-    price: '',
-    photoUrl: '/photos/medicine1.jpg'
-  });
-
-  // Состояние для редактирования
+  // Состояние для редактирования (пока оставляем на useState для простоты)
   const [editingItem, setEditingItem] = useState(null);
   const [editForm, setEditForm] = useState({});
+
+  // ────────────────────────────────────
+  // React Hook Form для создания
+  // ────────────────────────────────────
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(medicineSchema),
+    defaultValues: {
+      name: '',
+      manufacturer: '',
+      price: '',
+      discount: '',
+      dateReceived: new Date().toISOString().slice(0, 10),
+      photoUrl: '/photos/medicine1.jpg',
+    },
+  });
+
+  const priceValue = watch('price');
 
   useEffect(() => {
     dispatch(fetchMedicines({ page, limit: 10, search }));
@@ -74,7 +112,6 @@ function MedicinesPage() {
   // ────────────────────────────────────
   const exportToPDF = () => {
     const doc = new jsPDF();
-    
     doc.setFontSize(16);
     doc.text('Отчет по лекарствам (Аптечный склад)', 14, 20);
     doc.setFontSize(10);
@@ -83,7 +120,6 @@ function MedicinesPage() {
     const tableData = items.map(m => [
       m.id, m.name, m.manufacturer, parseFloat(m.price).toFixed(2)
     ]);
-
     const total = items.reduce((sum, m) => sum + parseFloat(m.price), 0);
     tableData.push(['', 'ИТОГО:', '', total.toFixed(2)]);
 
@@ -94,35 +130,28 @@ function MedicinesPage() {
       styles: { font: 'helvetica', fontSize: 10 },
       headStyles: { fillColor: [38, 74, 81] },
     });
-
     doc.save('Отчет_Лекарства.pdf');
   };
 
   // ────────────────────────────────────
-  // СОЗДАНИЕ
+  // СОЗДАНИЕ (через RHF)
   // ────────────────────────────────────
-  const handleCreate = (e) => {
-    e.preventDefault();
-    if (!formData.name || !formData.manufacturer || !formData.price) {
-      alert('Заполните все поля');
-      return;
-    }
-    dispatch(createMedicine({
-      ...formData,
-      price: parseFloat(formData.price)
-    })).then(() => {
-      setFormData({
-        name: '',
-        manufacturer: '',
-        price: '',
-        photoUrl: '/photos/medicine1.jpg'
-      });
+  const onSubmitCreate = (data) => {
+    const payload = {
+      name: data.name,
+      manufacturer: data.manufacturer,
+      price: parseFloat(data.price),
+      photoUrl: data.photoUrl || '/photos/medicine1.jpg',
+    };
+
+    dispatch(createMedicine(payload)).then(() => {
       dispatch(fetchMedicines({ page, limit: 10, search }));
+      reset(); // Сброс формы
     });
   };
 
   // ────────────────────────────────────
-  // РЕДАКТИРОВАНИЕ
+  // РЕДАКТИРОВАНИЕ (старая логика)
   // ────────────────────────────────────
   const handleOpenEdit = (item) => {
     setEditingItem(item);
@@ -171,7 +200,6 @@ function MedicinesPage() {
       {!isAdmin && (
         <Alert variant="info">
           ℹ️ Вы просматриваете страницу в режиме <strong>«Только чтение»</strong>.
-          {!isAuthenticated && ' Войдите как администратор, чтобы управлять данными.'}
         </Alert>
       )}
 
@@ -185,44 +213,81 @@ function MedicinesPage() {
         className="mb-3"
       />
 
+      {/* ─── НОВАЯ ФОРМА С RHF ─── */}
       {isAdmin && (
         <div className="bg-light p-3 rounded mb-4">
-          <h5>➕ Добавить лекарство</h5>
-          <Form onSubmit={handleCreate} className="row g-2">
+          <h5>➕ Добавить лекарство (React Hook Form)</h5>
+          <form onSubmit={handleSubmit(onSubmitCreate)} className="row g-2">
+            
             <div className="col-md-3">
-              <Form.Control
-                placeholder="Название"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
+              <label className="form-label">Название *</label>
+              <input {...register('name')} className={`form-control ${errors.name ? 'is-invalid' : ''}`} />
+              {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
             </div>
+
             <div className="col-md-3">
-              <Form.Control
-                placeholder="Производитель"
-                value={formData.manufacturer}
-                onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })}
-              />
+              <label className="form-label">Производитель *</label>
+              <input {...register('manufacturer')} className={`form-control ${errors.manufacturer ? 'is-invalid' : ''}`} />
+              {errors.manufacturer && <div className="invalid-feedback">{errors.manufacturer.message}</div>}
             </div>
+
             <div className="col-md-2">
-              <Form.Control
+              <label className="form-label">Цена (руб.) *</label>
+              <input
                 type="number"
                 step="0.01"
-                placeholder="Цена"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                {...register('price')}
+                className={`form-control ${errors.price ? 'is-invalid' : ''}`}
+              />
+              {errors.price && <div className="invalid-feedback">{errors.price.message}</div>}
+            </div>
+
+            {/* Зависимое поле: показываем, если цена > 500 */}
+            {parseFloat(priceValue) > 500 && (
+              <div className="col-md-2">
+                <label className="form-label">Скидка (%)</label>
+                <input
+                  type="number"
+                  {...register('discount')}
+                  className={`form-control ${errors.discount ? 'is-invalid' : ''}`}
+                />
+                {errors.discount && <div className="invalid-feedback">{errors.discount.message}</div>}
+              </div>
+            )}
+
+            <div className="col-md-2">
+              <label className="form-label">Дата поступления *</label>
+              <input
+                type="date"
+                {...register('dateReceived')}
+                className={`form-control ${errors.dateReceived ? 'is-invalid' : ''}`}
+              />
+              {errors.dateReceived && <div className="invalid-feedback">{errors.dateReceived.message}</div>}
+            </div>
+
+            {/* Загрузка файла */}
+            <div className="col-md-4 mt-3">
+              <label className="form-label">Фото (загрузка файла)</label>
+              <input
+                type="file"
+                className="form-control"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const localUrl = URL.createObjectURL(file);
+                    setValue('photoUrl', localUrl);
+                  }
+                }}
               />
             </div>
-            <div className="col-md-2">
-              <Form.Control
-                placeholder="URL фото"
-                value={formData.photoUrl}
-                onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
-              />
+
+            <div className="col-md-2 mt-5">
+              <button type="submit" className="btn btn-primary w-100">
+                Добавить
+              </button>
             </div>
-            <div className="col-md-2">
-              <Button type="submit" variant="primary" className="w-100">Добавить</Button>
-            </div>
-          </Form>
+          </form>
         </div>
       )}
 
@@ -291,6 +356,7 @@ function MedicinesPage() {
         </>
       )}
 
+      {/* Модалка редактирования (пока старая логика) */}
       {isAdmin && (
         <Modal show={!!editingItem} onHide={() => setEditingItem(null)} centered>
           <Modal.Header closeButton>
