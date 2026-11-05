@@ -2,12 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { Navbar, Nav, Container, Button, Badge } from 'react-bootstrap';
 
-// Layout
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
 import { ThemeProvider } from './context/ThemeContext';
 
-// Магазин мебели (lab7 — основной функционал)
 import HomePage from './components/pages/HomePage';
 import CatalogPage from './components/pages/CatalogPage';
 import CartPage from './components/pages/CartPage';
@@ -16,43 +14,30 @@ import FeedbackPage from './components/pages/FeedbackPage';
 import AdminPage from './components/pages/AdminPage';
 import NotFoundPage from './components/pages/NotFoundPage';
 
-// Аптечный склад (lab7)
 import MedicinesPage from './components/pages/MedicinesPage';
 import PharmaciesPage from './components/pages/PharmaciesPage';
 import OrdersPage from './components/pages/OrdersPage';
 import PurchasesPage from './components/pages/PurchasesPage';
 import ReportsPage from './components/pages/ReportsPage';
 
-// Авторизация (lab8)
 import LoginPage from './components/pages/LoginPage';
 import RegisterPage from './components/pages/RegisterPage';
 import ForgotPasswordPage from './components/pages/ForgotPasswordPage';
 import ResetPasswordPage from './components/pages/ResetPasswordPage';
 import ChangePasswordPage from './components/pages/ChangePasswordPage';
 
-// Дашборд с графиками (lab9)
 import DashboardPage from './components/pages/DashboardPage';
 
-// Redux
 import { useAppDispatch, useAppSelector } from './hooks/reduxHooks';
 import { selectCartCount, clearCart } from './features/cart/cartSlice';
 import { clearFavorites } from './features/favorites/favoritesSlice';
-import {
-  logout,
-  selectUser,
-  selectIsAuthenticated,
-  selectIsAdmin
-} from './features/auth/authSlice';
+import { logout, selectUser, selectIsAuthenticated, selectIsAdmin } from './features/auth/authSlice';
 
 import './App.css';
 
-// ────────────────────────────────────────
-// Header
-// ────────────────────────────────────────
 function Header() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
   const user = useAppSelector(selectUser);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const isAdmin = useAppSelector(selectIsAdmin);
@@ -70,12 +55,9 @@ function Header() {
   return (
     <Navbar bg="dark" variant="dark" expand="lg" className="mb-4 rounded">
       <Container fluid>
-        <Navbar.Brand as={Link} to="/" className="fw-bold">
-          🌿 Greenery
-        </Navbar.Brand>
+        <Navbar.Brand as={Link} to="/" className="fw-bold">🌿 Greenery</Navbar.Brand>
         <Navbar.Toggle aria-controls="header-nav" />
         <Navbar.Collapse id="header-nav">
-          {/* Левая часть — навигация */}
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/medicines">💊 Лекарства</Nav.Link>
             <Nav.Link as={Link} to="/pharmacies">🏥 Аптеки</Nav.Link>
@@ -84,31 +66,18 @@ function Header() {
             <Nav.Link as={Link} to="/reports">📊 Отчёты</Nav.Link>
             <Nav.Link as={Link} to="/dashboard">📈 Дашборд</Nav.Link>
           </Nav>
-
-          {/* Правая часть — пользователь и корзина */}
           <Nav className="align-items-center">
             <Nav.Link as={Link} to="/cart">
               🛒 Корзина
-              {cartCount > 0 && (
-                <Badge bg="danger" pill className="ms-1">{cartCount}</Badge>
-              )}
+              {cartCount > 0 && <Badge bg="danger" pill className="ms-1">{cartCount}</Badge>}
             </Nav.Link>
-
             {isAuthenticated ? (
               <>
                 <Navbar.Text className="mx-2">
-                  👤 {user?.email}{' '}
-                  {isAdmin && <Badge bg="warning" text="dark">ADMIN</Badge>}
+                  👤 {user?.email} {isAdmin && <Badge bg="warning" text="dark">ADMIN</Badge>}
                 </Navbar.Text>
                 <Nav.Link as={Link} to="/change-password">🔒 Пароль</Nav.Link>
-                <Button
-                  variant="outline-light"
-                  size="sm"
-                  className="ms-2"
-                  onClick={handleLogout}
-                >
-                  Выйти
-                </Button>
+                <Button variant="outline-light" size="sm" className="ms-2" onClick={handleLogout}>Выйти</Button>
               </>
             ) : (
               <>
@@ -123,47 +92,35 @@ function Header() {
   );
 }
 
-// ────────────────────────────────────────
-// App
-// ────────────────────────────────────────
 function App() {
-  const companyName = 'Greenery';
-  const mainTitle = 'Best Furniture For Your Interior';
-
   return (
     <ThemeProvider>
       <Router>
         <div className="app-container d-flex">
-          <Sidebar companyName={companyName} />
+          <Sidebar companyName="Greenery" />
           <main className="main-content flex-grow-1 p-3">
             <Header />
             <Routes>
-              {/* ─── Магазин мебели ─── */}
-              <Route path="/" element={<HomePage title={mainTitle} />} />
+              <Route path="/" element={<HomePage title="Best Furniture For Your Interior" />} />
               <Route path="/catalog" element={<CatalogPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               <Route path="/feedback" element={<FeedbackPage />} />
               <Route path="/admin" element={<AdminPage />} />
 
-              {/* ─── Аптечный склад (lab7) ─── */}
               <Route path="/medicines" element={<MedicinesPage />} />
               <Route path="/pharmacies" element={<PharmaciesPage />} />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/purchases" element={<PurchasesPage />} />
               <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
 
-              {/* ─── Авторизация (lab8) ─── */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/change-password" element={<ChangePasswordPage />} />
 
-              {/* ─── Дашборд с графиками (lab9) ─── */}
-              <Route path="/dashboard" element={<DashboardPage />} />
-
-              {/* ─── 404 ─── */}
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
             <Footer />

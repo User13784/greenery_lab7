@@ -12,32 +12,12 @@ import { Table, Form, Button, Badge } from 'react-bootstrap';
 export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
-  const [rowSelection, setRowSelection] = useState({});
 
-  // Определение колонок
   const columns = useMemo(() => {
     const cols = [
       {
-        id: 'select',
-        header: ({ table }) => (
-          <Form.Check
-            type="checkbox"
-            checked={table.getIsAllRowsSelected()}
-            onChange={table.getToggleAllRowsSelectedHandler()}
-          />
-        ),
-        cell: ({ row }) => (
-          <Form.Check
-            type="checkbox"
-            checked={row.getIsSelected()}
-            onChange={row.getToggleSelectedHandler()}
-          />
-        ),
-      },
-      {
         accessorKey: 'id',
         header: 'ID',
-        cell: info => info.getValue(),
       },
       {
         accessorKey: 'photoUrl',
@@ -82,28 +62,29 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
     return cols;
   }, [isAdmin, onEdit, onDelete]);
 
-  // Инициализация таблицы
   const table = useReactTable({
     data,
     columns,
     state: {
       sorting,
       globalFilter,
-      rowSelection,
     },
-    enableRowSelection: true,
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
-    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    // 👇 Настройка пагинации по 10 записей 👇
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   });
 
   return (
     <div>
-      {/* Поле глобального поиска (фильтрация) */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <Form.Control
           type="text"
@@ -112,9 +93,6 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
           onChange={(e) => setGlobalFilter(e.target.value)}
           style={{ maxWidth: 300 }}
         />
-        <div className="text-muted">
-          Выбрано строк: {Object.keys(rowSelection).length}
-        </div>
       </div>
 
       <Table striped bordered hover responsive>
@@ -128,11 +106,7 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
                   style={{ cursor: header.column.getCanSort() ? 'pointer' : 'default' }}
                 >
                   {flexRender(header.column.columnDef.header, header.getContext())}
-                  {/* Индикатор сортировки */}
-                  {{
-                    asc: ' 🔼',
-                    desc: ' 🔽',
-                  }[header.column.getIsSorted()] ?? null}
+                  {{ asc: ' 🔼', desc: ' 🔽' }[header.column.getIsSorted()] ?? null}
                 </th>
               ))}
             </tr>
@@ -151,7 +125,6 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
         </tbody>
       </Table>
 
-      {/* Пагинация */}
       <div className="d-flex justify-content-between align-items-center">
         <div>
           <Button

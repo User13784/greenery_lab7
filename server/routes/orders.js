@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { Order, Pharmacy, Purchase, Medicine } = require('../models');
+const { authenticateToken, authorizeRole } = require('../middleware/auth');
 
+// GET /api/orders — список с аптеками и закупками (публичный)
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, sort = 'id', order = 'ASC' } = req.query;
@@ -14,7 +16,8 @@ router.get('/', async (req, res) => {
       include: [
         { model: Pharmacy, as: 'pharmacy' },
         {
-          model: Purchase, as: 'purchases',
+          model: Purchase,
+          as: 'purchases',
           include: [{ model: Medicine, as: 'medicine' }]
         }
       ]
@@ -31,13 +34,15 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/orders/:id — детали (публичный)
 router.get('/:id', async (req, res) => {
   try {
     const item = await Order.findByPk(req.params.id, {
       include: [
         { model: Pharmacy, as: 'pharmacy' },
         {
-          model: Purchase, as: 'purchases',
+          model: Purchase,
+          as: 'purchases',
           include: [{ model: Medicine, as: 'medicine' }]
         }
       ]
@@ -49,6 +54,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// HEAD /api/orders/:id — проверка (публичный)
 router.head('/:id', async (req, res) => {
   try {
     const item = await Order.findByPk(req.params.id);
@@ -58,7 +64,8 @@ router.head('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+// POST /api/orders — создание (только админ)
+router.post('/', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Order.create(req.body);
     res.status(201).json(item);
@@ -67,7 +74,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+// PUT /api/orders/:id — обновление (только админ)
+router.put('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Order.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'Заявка не найдена' });
@@ -78,7 +86,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+// DELETE /api/orders/:id — удаление (только админ)
+router.delete('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const item = await Order.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'Заявка не найдена' });

@@ -41,13 +41,17 @@ export default function ForgotPasswordPage() {
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Запросить токен</Button>
           </Form>
+
           {resetToken && (
             <Alert variant="info" className="mt-3">
               <strong>Ваш resetToken:</strong>
               <code className="d-block mt-2" style={{ wordBreak: 'break-all' }}>{resetToken}</code>
-              <Link to="/reset-password" className="btn btn-warning w-100 mt-3">→ Перейти к сбросу пароля</Link>
+              <Link to="/reset-password" className="btn btn-warning w-100 mt-3">
+                → Перейти к сбросу пароля
+              </Link>
             </Alert>
           )}
+
           <div className="mt-3 text-center">
             <Link to="/login">← Назад ко входу</Link>
           </div>

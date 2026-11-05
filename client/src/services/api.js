@@ -8,7 +8,7 @@ const api = axios.create({
   timeout: 10000
 });
 
-// Интерцептор: автоматически добавляет JWT-токен
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -20,9 +20,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ────────────────────────────────────────
-// API для лабораторной №7 и №9
-// ────────────────────────────────────────
+
 export const medicinesAPI = {
   getAll: (params) => api.get('/medicines', { params }).then(r => r.data),
   getById: (id) => api.get(`/medicines/${id}`).then(r => r.data),
@@ -30,6 +28,7 @@ export const medicinesAPI = {
   update: (id, data) => api.put(`/medicines/${id}`, data).then(r => r.data),
   delete: (id) => api.delete(`/medicines/${id}`).then(r => r.data)
 };
+
 
 export const pharmaciesAPI = {
   getAll: (params) => api.get('/pharmacies', { params }).then(r => r.data),
@@ -39,6 +38,7 @@ export const pharmaciesAPI = {
   delete: (id) => api.delete(`/pharmacies/${id}`).then(r => r.data)
 };
 
+
 export const ordersAPI = {
   getAll: (params) => api.get('/orders', { params }).then(r => r.data),
   getById: (id) => api.get(`/orders/${id}`).then(r => r.data),
@@ -46,6 +46,7 @@ export const ordersAPI = {
   update: (id, data) => api.put(`/orders/${id}`, data).then(r => r.data),
   delete: (id) => api.delete(`/orders/${id}`).then(r => r.data)
 };
+
 
 export const purchasesAPI = {
   getAll: (params) => api.get('/purchases', { params }).then(r => r.data),
@@ -55,13 +56,13 @@ export const purchasesAPI = {
   delete: (id) => api.delete(`/purchases/${id}`).then(r => r.data)
 };
 
+
 export const reportsAPI = {
-  getOrdersReport: (year) => api.get('/reports/orders', { params: { year } }).then(r => r.data)
+  getOrdersReport: (year) =>
+    api.get('/reports/orders', { params: { year } }).then(r => r.data)
 };
 
-// ────────────────────────────────────────
-// API для лабораторной №8 (Авторизация)
-// ────────────────────────────────────────
+
 export const authAPI = {
   register: (data) => api.post('/auth/register', data).then(r => r.data),
   login: (data) => api.post('/auth/login', data).then(r => r.data),
