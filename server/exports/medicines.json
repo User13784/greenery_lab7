@@ -1,0 +1,160 @@
+[{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02ba"
+  },
+  "name": "Аспирин",
+  "manufacturer": "Фармстандарт",
+  "price": 11.85,
+  "photoUrl": "/photos/medicine1.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.699Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.699Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02bb"
+  },
+  "name": "Анальгин",
+  "manufacturer": "Борисовский завод",
+  "price": 22.67,
+  "photoUrl": "/photos/medicine2.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02bc"
+  },
+  "name": "Парацетамол",
+  "manufacturer": "Гедеон Рихтер",
+  "price": 8.94,
+  "photoUrl": "/photos/medicine3.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02bd"
+  },
+  "name": "Ибупрофен",
+  "manufacturer": "Berlin-Chemie",
+  "price": 23.02,
+  "photoUrl": "/photos/medicine4.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02be"
+  },
+  "name": "Нурофен",
+  "manufacturer": "Sanofi",
+  "price": 24.28,
+  "photoUrl": "/photos/medicine5.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02bf"
+  },
+  "name": "Витамин C",
+  "manufacturer": "Фармстандарт",
+  "price": 16.79,
+  "photoUrl": "/photos/medicine6.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02c0"
+  },
+  "name": "Магне B6",
+  "manufacturer": "Борисовский завод",
+  "price": 19.4,
+  "photoUrl": "/photos/medicine7.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02c1"
+  },
+  "name": "Уголь активированный",
+  "manufacturer": "Гедеон Рихтер",
+  "price": 21.38,
+  "photoUrl": "/photos/medicine8.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02c2"
+  },
+  "name": "Смекта",
+  "manufacturer": "Berlin-Chemie",
+  "price": 13.63,
+  "photoUrl": "/photos/medicine9.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02c3"
+  },
+  "name": "Линекс",
+  "manufacturer": "Sanofi",
+  "price": 11.97,
+  "photoUrl": "/photos/medicine10.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.700Z"
+  }
+}]

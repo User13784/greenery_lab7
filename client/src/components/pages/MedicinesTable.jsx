@@ -12,10 +12,12 @@ import { Table, Form, Button, Badge } from 'react-bootstrap';
 export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
-  const [rowSelection, setRowSelection] = useState({}); 
+  const [rowSelection, setRowSelection] = useState({});
 
+  // Определение колонок
   const columns = useMemo(() => {
     const cols = [
+      // Колонка с чекбоксами
       {
         id: 'select',
         header: ({ table }) => (
@@ -23,7 +25,6 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
             type="checkbox"
             checked={table.getIsAllRowsSelected()}
             onChange={table.getToggleAllRowsSelectedHandler()}
-            title="Выбрать все"
           />
         ),
         cell: ({ row }) => (
@@ -31,14 +32,10 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
             type="checkbox"
             checked={row.getIsSelected()}
             onChange={row.getToggleSelectedHandler()}
-            title="Выбрать строку"
           />
         ),
       },
-      {
-        accessorKey: 'id',
-        header: 'ID',
-      },
+      { accessorKey: '_id', header: 'ID' },
       {
         accessorKey: 'photoUrl',
         header: 'Фото',
@@ -46,19 +43,13 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
           <img
             src={info.getValue() || '/photos/medicine1.jpg'}
             alt="фото"
-            style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }}
+            style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
             onError={(e) => { e.target.src = '/photos/medicine1.jpg'; }}
           />
         ),
       },
-      {
-        accessorKey: 'name',
-        header: 'Название',
-      },
-      {
-        accessorKey: 'manufacturer',
-        header: 'Производитель',
-      },
+      { accessorKey: 'name', header: 'Название' }, // Оригинальное название
+      { accessorKey: 'manufacturer', header: 'Производитель' },
       {
         accessorKey: 'price',
         header: 'Цена (руб.)',
@@ -72,8 +63,9 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
         header: 'Действия',
         cell: ({ row }) => (
           <div className="d-flex gap-1">
+            {/* ⚠️ ВАЖНО: используем _id для MongoDB */}
             <Button size="sm" variant="warning" onClick={() => onEdit(row.original)}>✏️</Button>
-            <Button size="sm" variant="danger" onClick={() => onDelete(row.original.id, row.original.name)}>🗑️</Button>
+            <Button size="sm" variant="danger" onClick={() => onDelete(row.original._id, row.original.name)}>🗑️</Button>
           </div>
         ),
       });
@@ -85,29 +77,21 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
   const table = useReactTable({
     data,
     columns,
-    state: {
-      sorting,
-      globalFilter,
-      rowSelection, 
-    },
-    enableRowSelection: true, 
+    state: { sorting, globalFilter, rowSelection },
+    enableRowSelection: true,
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
-    onRowSelectionChange: setRowSelection, 
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
-    },
+    initialState: { pagination: { pageSize: 10 } },
   });
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <div className="d-flex justify-content-between align-items-center mb-3">
         <Form.Control
           type="text"
           placeholder="🔍 Фильтр по всей таблице..."

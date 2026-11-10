@@ -1,0 +1,160 @@
+[{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b0"
+  },
+  "name": "Аптека №1",
+  "address": "ул. Ленина, д. 1",
+  "phone": "+375 (29) 111-22-01",
+  "photoUrl": "/photos/pharmacy1.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.692Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.692Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b1"
+  },
+  "name": "Аптека №2",
+  "address": "ул. Ленина, д. 2",
+  "phone": "+375 (29) 111-22-02",
+  "photoUrl": "/photos/pharmacy2.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b2"
+  },
+  "name": "Аптека №3",
+  "address": "ул. Ленина, д. 3",
+  "phone": "+375 (29) 111-22-03",
+  "photoUrl": "/photos/pharmacy3.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b3"
+  },
+  "name": "Аптека №4",
+  "address": "ул. Ленина, д. 4",
+  "phone": "+375 (29) 111-22-04",
+  "photoUrl": "/photos/pharmacy4.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b4"
+  },
+  "name": "Аптека №5",
+  "address": "ул. Ленина, д. 5",
+  "phone": "+375 (29) 111-22-05",
+  "photoUrl": "/photos/pharmacy5.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b5"
+  },
+  "name": "Аптека №6",
+  "address": "ул. Ленина, д. 6",
+  "phone": "+375 (29) 111-22-06",
+  "photoUrl": "/photos/pharmacy6.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b6"
+  },
+  "name": "Аптека №7",
+  "address": "ул. Ленина, д. 7",
+  "phone": "+375 (29) 111-22-07",
+  "photoUrl": "/photos/pharmacy7.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b7"
+  },
+  "name": "Аптека №8",
+  "address": "ул. Ленина, д. 8",
+  "phone": "+375 (29) 111-22-08",
+  "photoUrl": "/photos/pharmacy8.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b8"
+  },
+  "name": "Аптека №9",
+  "address": "ул. Ленина, д. 9",
+  "phone": "+375 (29) 111-22-09",
+  "photoUrl": "/photos/pharmacy9.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02b9"
+  },
+  "name": "Аптека №10",
+  "address": "ул. Ленина, д. 10",
+  "phone": "+375 (29) 111-22-10",
+  "photoUrl": "/photos/pharmacy10.jpg",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.693Z"
+  }
+}]

@@ -1,0 +1,380 @@
+[{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02ce"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c4"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02ba"
+  },
+  "quantity": 41,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02cf"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c5"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02bb"
+  },
+  "quantity": 46,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d0"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c6"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02bc"
+  },
+  "quantity": 45,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d1"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c7"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02bd"
+  },
+  "quantity": 19,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d2"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c8"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02be"
+  },
+  "quantity": 26,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d3"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c9"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02bf"
+  },
+  "quantity": 26,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d4"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02ca"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02c0"
+  },
+  "quantity": 13,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d5"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02cb"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02c1"
+  },
+  "quantity": 35,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d6"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02cc"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02c2"
+  },
+  "quantity": 42,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d7"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02cd"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02c3"
+  },
+  "quantity": 46,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d8"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c4"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02ba"
+  },
+  "quantity": 47,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02d9"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c5"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02bb"
+  },
+  "quantity": 34,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02da"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c6"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02bc"
+  },
+  "quantity": 20,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02db"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c7"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02bd"
+  },
+  "quantity": 17,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02dc"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c8"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02be"
+  },
+  "quantity": 11,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02dd"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02c9"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02bf"
+  },
+  "quantity": 36,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02de"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02ca"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02c0"
+  },
+  "quantity": 5,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02df"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02cb"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02c1"
+  },
+  "quantity": 30,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02e0"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02cc"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02c2"
+  },
+  "quantity": 4,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6af37e90f851b8aa69fa02e1"
+  },
+  "order": {
+    "$oid": "6af37e90f851b8aa69fa02cd"
+  },
+  "medicine": {
+    "$oid": "6af37e90f851b8aa69fa02c3"
+  },
+  "quantity": 13,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  },
+  "updatedAt": {
+    "$date": "2026-11-10T20:29:04.707Z"
+  }
+}]

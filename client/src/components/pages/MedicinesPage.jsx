@@ -31,20 +31,45 @@ function MedicinesPage() {
 
   const [search, setSearch] = useState('');
   
+  // Состояние формы (photoUrl теперь может хранить base64 или путь)
   const [formData, setFormData] = useState({
     name: '',
     manufacturer: '',
     price: '',
-    photoUrl: '' 
+    photoUrl: ''
   });
 
   const [editingItem, setEditingItem] = useState(null);
   const [editForm, setEditForm] = useState({});
 
   useEffect(() => {
-    dispatch(fetchMedicines({ limit: 100, search }));
+    dispatch(fetchMedicines({ limit: 100, search, sort: 'createdAt', order: 'desc' }));
   }, [dispatch, search]);
 
+  // ────────────────────────────────────
+  // ОБРАБОТКА ЗАГРУЗКИ ФАЙЛА (В BASE64)
+  // ────────────────────────────────────
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Проверяем, что это картинка
+      if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите изображение (jpg, png и т.д.)');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // reader.result содержит строку вида "data:image/jpeg;base64,/9j/4AAQ..."
+        setFormData({ ...formData, photoUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // ────────────────────────────────────
+  // ОТПРАВКА ФОРМЫ
+  // ────────────────────────────────────
   const handleCreate = (e) => {
     e.preventDefault();
     
@@ -52,9 +77,8 @@ function MedicinesPage() {
       alert('Заполните все текстовые поля!');
       return;
     }
-
     if (!formData.photoUrl) {
-      alert('Пожалуйста, выберите фото для лекарства!');
+      alert('Пожалуйста, выберите фото!');
       return;
     }
 
@@ -64,7 +88,7 @@ function MedicinesPage() {
     })).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
         setFormData({ name: '', manufacturer: '', price: '', photoUrl: '' });
-        dispatch(fetchMedicines({ limit: 100, search }));
+        dispatch(fetchMedicines({ limit: 100, search, sort: 'createdAt', order: 'desc' }));
         alert("Успех! Запись добавлена.");
       } else {
         alert('Ошибка сервера: ' + JSON.stringify(res.payload));
@@ -74,8 +98,11 @@ function MedicinesPage() {
     });
   };
 
+  // ────────────────────────────────────
+  // ЭКСПОРТ
+  // ────────────────────────────────────
   const exportToExcel = () => {
-    const data = items.map(m => ({ 'ID': m.id, 'Название': m.name, 'Производитель': m.manufacturer, 'Цена (руб.)': parseFloat(m.price) }));
+    const data = items.map(m => ({ 'ID': m._id, 'Название': m.name, 'Производитель': m.manufacturer, 'Цена (руб.)': parseFloat(m.price) }));
     data.push({ 'Название': 'ИТОГО:', 'Цена (руб.)': items.reduce((sum, m) => sum + parseFloat(m.price), 0) });
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -96,29 +123,32 @@ function MedicinesPage() {
     doc.autoTable({
       startY: 35,
       head: [['ID', 'Название', 'Производитель', 'Цена (руб.)']],
-      body: items.map(m => [m.id, m.name, m.manufacturer, parseFloat(m.price).toFixed(2)]),
+      body: items.map(m => [m._id.substring(0,6), m.name, m.manufacturer, parseFloat(m.price).toFixed(2)]),
       styles: { font: 'Roboto', fontSize: 10 },
       headStyles: { fillColor: [38, 74, 81], textColor: 255, font: 'Roboto', fontStyle: 'normal' },
     });
     doc.save('Отчет_Лекарства.pdf');
   };
 
-   const handleOpenEdit = (item) => {
+  // ────────────────────────────────────
+  // РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ
+  // ────────────────────────────────────
+  const handleOpenEdit = (item) => {
     setEditingItem(item);
-    setEditForm({ name: item.name, manufacturer: item.manufacturer, price: item.price });
+    setEditForm({ name: item.name, manufacturer: item.manufacturer, price: item.price, photoUrl: item.photoUrl });
   };
 
   const handleSaveEdit = (e) => {
     e.preventDefault();
-    dispatch(updateMedicine({ id: editingItem.id, data: { ...editForm, price: parseFloat(editForm.price) } })).then(() => {
+    dispatch(updateMedicine({ id: editingItem._id, data: { ...editForm, price: parseFloat(editForm.price) } })).then(() => {
       setEditingItem(null);
-      dispatch(fetchMedicines({ limit: 100, search }));
+      dispatch(fetchMedicines({ limit: 100, search, sort: 'createdAt', order: 'desc' }));
     });
   };
 
   const handleDelete = (id, name) => {
     if (window.confirm(`Удалить "${name}"?`)) {
-      dispatch(deleteMedicine(id)).then(() => dispatch(fetchMedicines({ limit: 100, search })));
+      dispatch(deleteMedicine(id)).then(() => dispatch(fetchMedicines({ limit: 100, search, sort: 'createdAt', order: 'desc' })));
     }
   };
 
@@ -142,53 +172,41 @@ function MedicinesPage() {
 
       {isAdmin && (
         <div className="bg-light p-3 rounded mb-4">
-          <h5>➕ Добавить лекарство (все поля обязательны)</h5>
+          <h5>➕ Добавить лекарство</h5>
           <form onSubmit={handleCreate} className="row g-2">
             
-            <div className="col-md-4">
-              <input 
-                className="form-control" 
-                placeholder="Название" 
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
+            <div className="col-md-3">
+              <input className="form-control" placeholder="Название" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+            </div>
+            <div className="col-md-3">
+              <input className="form-control" placeholder="Производитель" value={formData.manufacturer} onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })} />
+            </div>
+            <div className="col-md-2">
+              <input type="number" className="form-control" placeholder="Цена" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} />
             </div>
 
-            <div className="col-md-4">
-              <input 
-                className="form-control" 
-                placeholder="Производитель" 
-                value={formData.manufacturer}
-                onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })}
-              />
-            </div>
-
-            <div className="col-md-4">
-              <input 
-                type="number" 
-                className="form-control" 
-                placeholder="Цена" 
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              />
-            </div>
-
-            <div className="col-md-8 mt-3">
+            {/* ЗАГРУЗКА ФАЙЛА */}
+            <div className="col-md-3">
               <input 
                 type="file" 
                 className="form-control"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const localUrl = URL.createObjectURL(file);
-                    setFormData({ ...formData, photoUrl: localUrl });
-                  }
-                }}
+                onChange={handleFileChange}
               />
             </div>
 
-            <div className="col-md-4 mt-3">
+            {/* ПРЕДПРОСМОТР ФОТО */}
+            {formData.photoUrl && (
+              <div className="col-md-1">
+                <img 
+                  src={formData.photoUrl} 
+                  alt="Preview" 
+                  style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} 
+                />
+              </div>
+            )}
+
+            <div className="col-md-2 mt-2">
               <button type="submit" className="btn btn-primary w-100">Добавить</button>
             </div>
           </form>
