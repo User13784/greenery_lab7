@@ -12,9 +12,29 @@ import { Table, Form, Button, Badge } from 'react-bootstrap';
 export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [rowSelection, setRowSelection] = useState({}); 
 
   const columns = useMemo(() => {
     const cols = [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <Form.Check
+            type="checkbox"
+            checked={table.getIsAllRowsSelected()}
+            onChange={table.getToggleAllRowsSelectedHandler()}
+            title="Выбрать все"
+          />
+        ),
+        cell: ({ row }) => (
+          <Form.Check
+            type="checkbox"
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
+            title="Выбрать строку"
+          />
+        ),
+      },
       {
         accessorKey: 'id',
         header: 'ID',
@@ -68,14 +88,16 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
     state: {
       sorting,
       globalFilter,
+      rowSelection, 
     },
+    enableRowSelection: true, 
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onRowSelectionChange: setRowSelection, 
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    // 👇 Настройка пагинации по 10 записей 👇
     initialState: {
       pagination: {
         pageSize: 10,
@@ -85,7 +107,7 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <Form.Control
           type="text"
           placeholder="🔍 Фильтр по всей таблице..."
@@ -93,6 +115,9 @@ export default function MedicinesTable({ data, onEdit, onDelete, isAdmin }) {
           onChange={(e) => setGlobalFilter(e.target.value)}
           style={{ maxWidth: 300 }}
         />
+        <div className="text-muted">
+          Выбрано строк: <strong>{Object.keys(rowSelection).length}</strong>
+        </div>
       </div>
 
       <Table striped bordered hover responsive>

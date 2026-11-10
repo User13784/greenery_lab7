@@ -31,35 +31,28 @@ function MedicinesPage() {
 
   const [search, setSearch] = useState('');
   
-  // Состояние формы
   const [formData, setFormData] = useState({
     name: '',
     manufacturer: '',
     price: '',
-    photoUrl: '' // Пустая строка, чтобы требовать загрузку
+    photoUrl: '' 
   });
 
   const [editingItem, setEditingItem] = useState(null);
   const [editForm, setEditForm] = useState({});
 
-  // Запрашиваем сразу 100 записей для пагинации на клиенте
   useEffect(() => {
     dispatch(fetchMedicines({ limit: 100, search }));
   }, [dispatch, search]);
 
-  // ────────────────────────────────────
-  // ОТПРАВКА ФОРМЫ
-  // ────────────────────────────────────
   const handleCreate = (e) => {
     e.preventDefault();
     
-    // 1. Проверка обязательных полей
     if (!formData.name || !formData.manufacturer || !formData.price) {
       alert('Заполните все текстовые поля!');
       return;
     }
 
-    // 2. Проверка, что фото загружено
     if (!formData.photoUrl) {
       alert('Пожалуйста, выберите фото для лекарства!');
       return;
@@ -81,9 +74,6 @@ function MedicinesPage() {
     });
   };
 
-  // ────────────────────────────────────
-  // ЭКСПОРТ
-  // ────────────────────────────────────
   const exportToExcel = () => {
     const data = items.map(m => ({ 'ID': m.id, 'Название': m.name, 'Производитель': m.manufacturer, 'Цена (руб.)': parseFloat(m.price) }));
     data.push({ 'Название': 'ИТОГО:', 'Цена (руб.)': items.reduce((sum, m) => sum + parseFloat(m.price), 0) });
@@ -113,10 +103,7 @@ function MedicinesPage() {
     doc.save('Отчет_Лекарства.pdf');
   };
 
-  // ────────────────────────────────────
-  // РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ
-  // ────────────────────────────────────
-  const handleOpenEdit = (item) => {
+   const handleOpenEdit = (item) => {
     setEditingItem(item);
     setEditForm({ name: item.name, manufacturer: item.manufacturer, price: item.price });
   };
@@ -158,7 +145,6 @@ function MedicinesPage() {
           <h5>➕ Добавить лекарство (все поля обязательны)</h5>
           <form onSubmit={handleCreate} className="row g-2">
             
-            {/* Первая строка: Название, Производитель, Цена */}
             <div className="col-md-4">
               <input 
                 className="form-control" 
@@ -187,7 +173,6 @@ function MedicinesPage() {
               />
             </div>
 
-            {/* Вторая строка: Загрузка фото и Кнопка Добавить */}
             <div className="col-md-8 mt-3">
               <input 
                 type="file" 
@@ -212,7 +197,6 @@ function MedicinesPage() {
 
       {loading && <p>Загрузка...</p>}
 
-      {/* Таблица с ключом, чтобы перерисовывалась при обновлении */}
       {!loading && items.length > 0 && (
         <MedicinesTable 
           key={items.length} 
