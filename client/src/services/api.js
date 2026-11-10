@@ -4,8 +4,22 @@ const API_URL = 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 10000
 });
+
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 
 export const medicinesAPI = {
   getAll: (params) => api.get('/medicines', { params }).then(r => r.data),
@@ -15,6 +29,7 @@ export const medicinesAPI = {
   delete: (id) => api.delete(`/medicines/${id}`).then(r => r.data)
 };
 
+
 export const pharmaciesAPI = {
   getAll: (params) => api.get('/pharmacies', { params }).then(r => r.data),
   getById: (id) => api.get(`/pharmacies/${id}`).then(r => r.data),
@@ -23,6 +38,7 @@ export const pharmaciesAPI = {
   delete: (id) => api.delete(`/pharmacies/${id}`).then(r => r.data)
 };
 
+
 export const ordersAPI = {
   getAll: (params) => api.get('/orders', { params }).then(r => r.data),
   getById: (id) => api.get(`/orders/${id}`).then(r => r.data),
@@ -30,6 +46,7 @@ export const ordersAPI = {
   update: (id, data) => api.put(`/orders/${id}`, data).then(r => r.data),
   delete: (id) => api.delete(`/orders/${id}`).then(r => r.data)
 };
+
 
 export const purchasesAPI = {
   getAll: (params) => api.get('/purchases', { params }).then(r => r.data),
@@ -41,7 +58,17 @@ export const purchasesAPI = {
 
 
 export const reportsAPI = {
-  getOrdersReport: (year) => api.get('/reports/orders', { params: { year } }).then(r => r.data)
+  getOrdersReport: (year) =>
+    api.get('/reports/orders', { params: { year } }).then(r => r.data)
+};
+
+
+export const authAPI = {
+  register: (data) => api.post('/auth/register', data).then(r => r.data),
+  login: (data) => api.post('/auth/login', data).then(r => r.data),
+  changePassword: (data) => api.post('/auth/change-password', data).then(r => r.data),
+  forgotPassword: (data) => api.post('/auth/forgot-password', data).then(r => r.data),
+  resetPassword: (data) => api.post('/auth/reset-password', data).then(r => r.data)
 };
 
 export default api;
