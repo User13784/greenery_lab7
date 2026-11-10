@@ -1,103 +1,76 @@
 const express = require('express');
 const router = express.Router();
-const { Pharmacy, Order } = require('../models');
-const { Sequelize, Op } = require('sequelize');
+const Pharmacy = require('../models/Pharmacy');
+const Order = require('../models/Order');
 const { authenticateToken, authorizeRole } = require('../middleware/auth');
 
-// GET /api/pharmacies — список (публичный)
 router.get('/', async (req, res) => {
   try {
-    const { page = 1, limit = 10, sort = 'id', order = 'ASC', search } = req.query;
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-    const where = {};
+    const { page = 1, limit = 10, sort = 'name', order = 'asc', search } = req.query;
+    const skip = (page - 1) * limit;
+    let query = {};
 
     if (search) {
-      const searchLower = search.toLowerCase();
-      where[Op.or] = [
-        Sequelize.where(
-          Sequelize.fn('LOWER', Sequelize.col('name')),
-          { [Op.like]: `%${searchLower}%` }
-        ),
-        Sequelize.where(
-          Sequelize.fn('LOWER', Sequelize.col('address')),
-          { [Op.like]: `%${searchLower}%` }
-        )
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { address: { $regex: search, $options: 'i' } }
       ];
     }
 
-    const result = await Pharmacy.findAndCountAll({
-      where,
-      limit: parseInt(limit),
-      offset,
-      order: [[sort, order.toUpperCase()]]
-    });
+    const sortOrder = order === 'desc' ? -1 : 1;
+    const pharmacies = await Pharmacy.find(query)
+      .sort({ [sort]: sortOrder })
+      .skip(skip)
+      .limit(Number(limit));
 
-    res.json({
-      totalItems: result.count,
-      totalPages: Math.ceil(result.count / limit),
-      currentPage: parseInt(page),
-      data: result.rows
-    });
+    const total = await Pharmacy.countDocuments(query);
+
+    res.json({ totalItems: total, totalPages: Math.ceil(total / limit), currentPage: Number(page), data: pharmacies });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/pharmacies/:id — детали + заявки (публичный)
+// GET по ID (с подтягиванием связанных заявок)
 router.get('/:id', async (req, res) => {
   try {
-    const item = await Pharmacy.findByPk(req.params.id, {
-      include: [{ model: Order, as: 'orders' }]
-    });
-    if (!item) return res.status(404).json({ error: 'Аптека не найдена' });
-    res.json(item);
+    const pharmacy = await Pharmacy.findById(req.params.id);
+    if (!pharmacy) return res.status(404).json({ error: 'Аптека не найдена' });
+    const orders = await Order.find({ pharmacy: pharmacy._id });
+    res.json({ ...pharmacy.toObject(), orders });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// HEAD /api/pharmacies/:id — проверка (публичный)
 router.head('/:id', async (req, res) => {
   try {
-    const item = await Pharmacy.findByPk(req.params.id);
-    res.status(item ? 200 : 404).end();
-  } catch (err) {
-    res.status(500).end();
-  }
+    const pharmacy = await Pharmacy.findById(req.params.id);
+    res.status(pharmacy ? 200 : 404).end();
+  } catch (err) { res.status(500).end(); }
 });
 
-// POST /api/pharmacies — создание (только админ)
 router.post('/', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
-    const item = await Pharmacy.create(req.body);
-    res.status(201).json(item);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+    const pharmacy = await Pharmacy.create(req.body);
+    res.status(201).json(pharmacy);
+  } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-// PUT /api/pharmacies/:id — обновление (только админ)
 router.put('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
-    const item = await Pharmacy.findByPk(req.params.id);
-    if (!item) return res.status(404).json({ error: 'Аптека не найдена' });
-    await item.update(req.body);
-    res.json(item);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+    const pharmacy = await Pharmacy.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!pharmacy) return res.status(404).json({ error: 'Аптека не найдена' });
+    res.json(pharmacy);
+  } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-// DELETE /api/pharmacies/:id — удаление (только админ)
 router.delete('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
-    const item = await Pharmacy.findByPk(req.params.id);
-    if (!item) return res.status(404).json({ error: 'Аптека не найдена' });
-    await item.destroy();
+    const pharmacy = await Pharmacy.findByIdAndDelete(req.params.id);
+    if (!pharmacy) return res.status(404).json({ error: 'Аптека не найдена' });
     res.json({ message: 'Аптека удалена' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 module.exports = router;

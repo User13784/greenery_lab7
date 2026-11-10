@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { Order, Pharmacy, Purchase, Medicine } = require('../models');
-const { Op } = require('sequelize');
+const Order = require('../models/Order');
+const Purchase = require('../models/Purchase');
 
 router.get('/orders', async (req, res) => {
   try {
@@ -9,58 +9,55 @@ router.get('/orders', async (req, res) => {
     const start = new Date(year, 0, 1);
     const end = new Date(year, 11, 31, 23, 59, 59);
 
-    const orders = await Order.findAll({
-      where: { createdDate: { [Op.between]: [start, end] } },
-      include: [
-        { model: Pharmacy, as: 'pharmacy' },
-        {
-          model: Purchase,
-          as: 'purchases',
-          include: [{ model: Medicine, as: 'medicine' }]
-        }
-      ],
-      order: [['id', 'ASC']]
-    });
+    // Находим заявки за нужный год с аптеками
+    const orders = await Order.find({ createdDate: { $gte: start, $lte: end } }).populate('pharmacy');
 
     let grandTotal = 0;
     let grandQuantity = 0;
 
-    const report = orders.map(order => {
+    const report = [];
+    
+    for (let order of orders) {
+      // Для каждой заявки достаем закупки и лекарства
+      const purchases = await Purchase.find({ order: order._id }).populate('medicine');
+      
       let orderTotal = 0;
       let orderQuantity = 0;
+      const items = [];
 
-      const items = order.purchases.map(p => {
-        const price = parseFloat(p.medicine.price);
+      for (let p of purchases) {
+        // Убедимся, что лекарство существует
+        if (!p.medicine) continue; 
+        
+        const price = p.medicine.price;
         const sum = p.quantity * price;
         orderTotal += sum;
         orderQuantity += p.quantity;
-
-        return {
+        
+        items.push({
           medicineName: p.medicine.name,
           manufacturer: p.medicine.manufacturer,
           quantity: p.quantity,
           price,
           sum
-        };
-      });
+        });
+      }
 
       grandTotal += orderTotal;
       grandQuantity += orderQuantity;
 
-      return {
-        orderId: order.id,
-        pharmacyName: order.pharmacy?.name || '—',
+      report.push({
+        orderId: order._id,
+        pharmacyName: order.pharmacy ? order.pharmacy.name : '—',
         date: order.createdDate,
         items,
         orderTotal,
         orderQuantity
-      };
-    });
+      });
+    }
 
     res.json({ year, report, grandTotal, grandQuantity });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 module.exports = router;
